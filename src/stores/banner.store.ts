@@ -1,5 +1,7 @@
 import { createGlobalStore } from "@/lib/globalStore";
 
-export const useBanner = createGlobalStore<any>("banner-informasi", undefined, [
-  "read",
-]);
+export const useBanner: any = createGlobalStore<any>(
+  "banner-informasi",
+  function () {},
+  ["read"]
+);

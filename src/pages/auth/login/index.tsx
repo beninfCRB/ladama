@@ -1,5 +1,6 @@
 import logo from "@/assets/logo.svg";
 import rafiki from "@/assets/rafiki.svg";
+import SkeletonCard from "@/components/custom-ui/SkeletonCard";
 import { BorderBeam } from "@/components/magicui/border-beam";
 import { ShinyButton } from "@/components/magicui/shiny-button";
 import { TypingAnimation } from "@/components/magicui/typing-animation";
@@ -28,7 +29,7 @@ import z from "zod";
 function AuthLogin() {
   const [showPassword, setShowPassword] = useState(false);
   const { query: banner } = useBanner();
-  const { createMutation } = useLogin();
+  const { query: login, createMutation } = useLogin();
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -135,7 +136,7 @@ function AuthLogin() {
                 </div>
               </div>
               <ShinyButton className="w-full h-12 bg-green-600 hover:bg-green-700 text-white rounded-lg text-2xl font-extrabold items-center justify-center flex">
-                {form.formState.isSubmitting ? (
+                {createMutation?.isPending ? (
                   <div className="flex items-center justify-center">
                     <Spinner className="text-white" size={20} />
                   </div>
@@ -221,7 +222,7 @@ function AuthLogin() {
                   }}
                 />
               ) : (
-                <Spinner className="text-white" size={54} />
+                <SkeletonCard height="h-8" width="w-auto" />
               )}
             </div>
           </CardContent>
