@@ -29,12 +29,28 @@ function DashboardPage() {
             <p className="text-sm text-gray-500">Selasa, 02 Sep 2025, 20.03</p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
-            <div className="sm:col-span-2 lg:col-span-1">
+          <div className="space-y-3 sm:space-y-4 lg:space-y-0">
+            {/* Progress section - full width on mobile and tablet */}
+            <div className="lg:hidden">
               <ProgressSubmissionSection />
             </div>
-            <CreateSubmissionSection />
-            <DraftSubmissionSection />
+
+            {/* Desktop layout - all three in one row */}
+            <div className="hidden lg:grid lg:grid-cols-3 lg:gap-6">
+              <ProgressSubmissionSection />
+              <CreateSubmissionSection />
+              <DraftSubmissionSection />
+            </div>
+
+            {/* Mobile and tablet layout - create and draft sections in one row with smaller cards */}
+            <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:hidden">
+              <div className="scale-90 sm:scale-95">
+                <CreateSubmissionSection />
+              </div>
+              <div className="scale-90 sm:scale-95">
+                <DraftSubmissionSection />
+              </div>
+            </div>
           </div>
 
           <div className="w-full">

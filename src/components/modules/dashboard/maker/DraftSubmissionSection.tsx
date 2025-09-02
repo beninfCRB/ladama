@@ -2,13 +2,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 function DraftSubmissionSection() {
   return (
-    <Card>
+    <Card className="h-full">
       <CardHeader>
         <CardTitle className="text-gray-600 font-medium">
           DRAFT PENGAJUAN
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex flex-col items-center justify-center py-8 space-y-4">
+      <CardContent className="flex flex-col items-center justify-center py-8 space-y-4 flex-1">
         <div className="text-center">
           <p className="text-sm text-gray-500">Tidak ada draft pengajuan</p>
         </div>
