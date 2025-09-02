@@ -6,8 +6,17 @@ import ProgressSubmissionSection from "@/components/modules/dashboard/maker/Prog
 import HeaderGroup from "@/components/modules/HeaderGroup";
 import MobileHeader from "@/components/modules/MobileHeader";
 import SidebarNavigation from "@/components/modules/SidebarNavigation";
+import { useEffect, useState } from "react";
+import moment from "moment";
 
 function DashboardPage() {
+  const [date, setDate] = useState(moment());
+
+  useEffect(() => {
+    const timer = setInterval(() => setDate(moment()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="hidden lg:block">
@@ -23,11 +32,13 @@ function DashboardPage() {
             <div className="flex items-center gap-2">
               <span className="text-gray-600">🏠</span>
               <span className="text-gray-600">Halo,</span>
-              <HyperText className="font-semibold text-gray-800 text-md">
+              <HyperText className="font-semibold text-[#10a249] text-md">
                 KELOMPOK PENANAMAN MANGROVE
               </HyperText>
             </div>
-            <p className="text-sm text-gray-500">Selasa, 02 Sep 2025, 20.03</p>
+            <p className="text-sm font-medium text-yellow-500">
+              {date.format("DD MMMM YYYY, HH:mm:ss")}
+            </p>
           </div>
 
           <div className="space-y-3 sm:space-y-4 lg:space-y-0">
