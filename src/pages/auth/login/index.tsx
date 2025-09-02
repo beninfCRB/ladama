@@ -230,6 +230,14 @@ function AuthLogin() {
             borderWidth={3}
             duration={8}
             size={600}
+            delay={4}
+            reverse
+            className="from-transparent via-gray-100 to-transparent"
+          />
+          <BorderBeam
+            borderWidth={3}
+            duration={8}
+            size={600}
             reverse
             className="from-transparent via-gray-100 to-transparent"
           />

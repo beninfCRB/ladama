@@ -6,7 +6,6 @@ function HeaderGroup() {
   return (
     <header className="bg-white border-b border-gray-200 px-4 py-3">
       <div className="container mx-auto flex items-center justify-between">
-        {/* Logo */}
         <div className="flex items-center gap-2">
           <img
             className="dark:invert"
@@ -17,7 +16,6 @@ function HeaderGroup() {
           />
         </div>
 
-        {/* User Info */}
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
             <Avatar className="w-8 h-8">

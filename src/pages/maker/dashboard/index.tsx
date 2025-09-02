@@ -1,3 +1,4 @@
+import { HyperText } from "@/components/magicui/hyper-text";
 import ActivityHistory from "@/components/modules/dashboard/maker/ActivityHistory";
 import CreateSubmissionSection from "@/components/modules/dashboard/maker/CreateSubmissionSection";
 import DraftSubmissionSection from "@/components/modules/dashboard/maker/DraftSubmissionSection";
@@ -22,27 +23,24 @@ function DashboardPage() {
             <div className="flex items-center gap-2">
               <span className="text-gray-600">🏠</span>
               <span className="text-gray-600">Halo,</span>
-              <span className="font-semibold text-gray-800">
+              <HyperText className="font-semibold text-gray-800 text-md">
                 KELOMPOK PENANAMAN MANGROVE
-              </span>
+              </HyperText>
             </div>
             <p className="text-sm text-gray-500">Selasa, 02 Sep 2025, 20.03</p>
           </div>
 
           <div className="space-y-3 sm:space-y-4 lg:space-y-0">
-            {/* Progress section - full width on mobile and tablet */}
             <div className="lg:hidden">
               <ProgressSubmissionSection />
             </div>
 
-            {/* Desktop layout - all three in one row */}
             <div className="hidden lg:grid lg:grid-cols-3 lg:gap-6">
               <ProgressSubmissionSection />
               <CreateSubmissionSection />
               <DraftSubmissionSection />
             </div>
 
-            {/* Mobile and tablet layout - create and draft sections in one row with smaller cards */}
             <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:hidden">
               <div className="scale-90 sm:scale-95">
                 <CreateSubmissionSection />
