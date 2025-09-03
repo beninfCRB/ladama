@@ -1,0 +1,123 @@
+stages:
+- lint
+- test
+- build
+- docker
+- deploy
+
+default:
+  image: node:20-alpine
+  cache:
+    key:
+      files:
+      - package-lock.json
+    paths:
+    - node_modules/
+
+.deploy_template: &deploy
+  image:
+    name: bitnami/kubectl:latest
+    entrypoint: [ "" ]
+  stage: deploy
+  before_script:
+  - echo "$K8S_CA_CRT" > ca.crt
+  - kubectl config set-cluster gitlab --server="$K8S_SERVER" --certificate-authority=ca.crt --embed-certs=true
+  - kubectl config set-credentials gitlab --token="$K8S_TOKEN"
+  - kubectl config set-context gitlab --cluster=gitlab --user=gitlab
+  - kubectl config use-context gitlab
+  - kubectl get ns "$K8S_NAMESPACE" >/dev/null 2>&1 || kubectl create ns "$K8S_NAMESPACE"
+  - kubectl config set-context --current --namespace="$K8S_NAMESPACE"
+  script:
+  - if kubectl get deploy "$APP_NAME" >/dev/null 2>&1; then kubectl set image deploy/$APP_NAME $CONTAINER_NAME=$IMAGE --record; else find k8s -name '*.yaml' -print0 | xargs -0 -I {} sh -c 'envsubst < "{}" | kubectl apply -f -'; fi
+  - kubectl rollout status deploy/$APP_NAME --timeout=300s
+
+variables:
+  CI_NODE_ENV: production
+  DOCKER_DRIVER: overlay2
+  IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
+
+lint_job:
+  stage: lint
+  # when: manual
+  script:
+  - npm ci
+  - npm run lint
+
+test_job:
+  stage: test
+  # when: manual
+  script:
+  - npm ci
+  - npm run test:ci
+  artifacts:
+    expire_in: 7 days
+    when: always
+    paths:
+    - coverage/
+
+build_job:
+  stage: build
+  # when: manual
+  script:
+  - npm ci
+  - npm run build
+  artifacts:
+    expire_in: 7 days
+    paths:
+    - dist/
+  only:
+  - main
+  - tags
+
+docker_build_push_job:
+  stage: docker
+  image: docker:24
+  services:
+  - docker:24-dind
+  variables:
+    DOCKER_TLS_CERTDIR: ""
+  # when: manual
+  script:
+  - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER $CI_REGISTRY --password-stdin
+  - docker build -t $IMAGE_TAG .
+  - docker push $IMAGE_TAG
+  only:
+  - main
+  - tags
+
+deploy_dev:
+  <<: *deploy
+  rules:
+  - if: '$CI_COMMIT_BRANCH =~ /^feature\//'
+  variables:
+    K8S_NAMESPACE: "dev"
+    IMAGE: "$IMAGE_DEV"
+  environment:
+    name: development
+    url: https://dev.example.com
+    deployment_tier: development
+
+deploy_staging:
+  <<: *deploy
+  rules:
+  - if: '$CI_COMMIT_BRANCH == "staging"'
+  variables:
+    K8S_NAMESPACE: "staging"
+    IMAGE: "$IMAGE_STAGING"
+  environment:
+    name: staging
+    url: https://staging.example.com
+    deployment_tier: staging
+
+deploy_prod:
+  <<: *deploy
+  rules:
+  - if: '$CI_COMMIT_BRANCH == "main"'
+    when: manual # butuh klik Play
+  variables:
+    K8S_NAMESPACE: "prod"
+    IMAGE: "$IMAGE_PROD"
+  environment:
+    name: production
+    url: https://app.example.com
+    deployment_tier: production

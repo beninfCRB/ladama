@@ -1,10 +1,10 @@
-import { defineConfig } from "vitest/config";
+import { defineConfig, mergeConfig } from "vite";
+import viteConfig from "./vite.config";
 
-export default defineConfig({
+export default mergeConfig(viteConfig, {
   test: {
-    coverage: {
-      provider: "v8", // atau "istanbul"
-      reporter: ["text", "lcov", "html"],
-    },
+    globals: true,
+    environment: "jsdom",
+    setupFiles: "./src/setupTests.ts",
   },
 });
