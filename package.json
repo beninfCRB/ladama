@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "lint": "eslint . --ext .js,.jsx --max-warnings=0",
     "test": "vitest",
-    "test:ci": "itest run --coverage.enabled=true --coverage.reporter=text --coverage.reporter=lcov --reporter=verbose"
+    "test:ci": "vitest run --coverage.enabled=true --coverage.reporter=text --coverage.reporter=lcov --reporter=verbose"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",
