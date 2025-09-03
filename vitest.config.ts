@@ -9,7 +9,7 @@ export default mergeConfig(viteConfig, {
     coverage: {
       enabled: true,
       reporter: ["text", "lcov", "html"],
-      reportsDirectory: "./coverage",
+      reportsDirectory: "/coverage",
     },
     reporters: ["verbose"],
   },
