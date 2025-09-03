@@ -11,7 +11,7 @@ default:
     key:
       files:
       - package-lock.json
-      paths:
+    paths:
       - node_modules/
 
 variables:
