@@ -6,5 +6,10 @@ export default mergeConfig(viteConfig, {
     globals: true,
     environment: "jsdom",
     setupFiles: "./src/setupTests.ts",
+    coverage: {
+      enabled: true,
+      reporter: ["text", "lcov"],
+    },
+    reporters: ["verbose"],
   },
 });
