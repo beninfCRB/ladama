@@ -8,7 +8,8 @@ export default mergeConfig(viteConfig, {
     setupFiles: "./src/setupTests.ts",
     coverage: {
       enabled: true,
-      reporter: ["text", "lcov"],
+      reporter: ["text", "lcov", "html"],
+      reportsDirectory: "./coverage",
     },
     reporters: ["verbose"],
   },
