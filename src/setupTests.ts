@@ -1,8 +1,12 @@
 class IntersectionObserverMock {
-  constructor(cb: any, options?: any) {}
+  constructor() {}
   observe() {}
   unobserve() {}
   disconnect() {}
+  takeRecords(): IntersectionObserverEntry[] {
+    return [];
+  }
 }
 
-(global as any).IntersectionObserver = IntersectionObserverMock;
+(window as typeof globalThis).IntersectionObserver =
+  IntersectionObserverMock as unknown as typeof IntersectionObserver;
