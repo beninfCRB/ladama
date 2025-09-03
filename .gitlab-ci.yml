@@ -11,8 +11,8 @@ default:
     key:
       files:
       - package-lock.json
-      paths:
-      - node_modules/
+    paths:
+    - node_modules/
 
 variables:
   CI_NODE_ENV: production
