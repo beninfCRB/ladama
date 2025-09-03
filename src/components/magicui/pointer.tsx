@@ -9,7 +9,9 @@ import {
 } from "motion/react";
 import { useEffect, useRef, useState, type JSX } from "react";
 
-interface PointerProps extends Omit<HTMLMotionProps<"div">, "ref"> {}
+interface PointerProps extends Omit<HTMLMotionProps<"div">, "ref"> {
+  _?: never;
+}
 
 /**
  * A custom pointer component that displays an animated cursor.

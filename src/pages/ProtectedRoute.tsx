@@ -11,10 +11,10 @@ export function ProtectedRoute() {
 
   useEffect(() => {
     const timeOut = 3600000;
-    let timer: any = 0;
+    let timer: number | undefined;
     const resetTimer = () => {
       clearTimeout(timer);
-      timer = setTimeout(() => {
+      timer = window.setTimeout(() => {
         setLoggedIn(false);
         localStorage.removeItem("token");
         navigate("/login");
