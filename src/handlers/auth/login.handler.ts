@@ -14,7 +14,7 @@ async function handleLogin(res?: ResponseType<UserType>) {
     window.location.replace("/pmu-bpdlh/dashboard");
   }
 }
-async function handleLogout(res?: ResponseType<UserType>) {
+async function handleLogout() {
   removeStorage();
   window.location.replace("/login");
 }

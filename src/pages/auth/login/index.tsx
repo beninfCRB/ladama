@@ -29,7 +29,7 @@ import z from "zod";
 function AuthLogin() {
   const [showPassword, setShowPassword] = useState(false);
   const { query: banner } = useBanner();
-  const { query: login, createMutation } = useLogin();
+  const { createMutation } = useLogin();
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),

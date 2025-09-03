@@ -152,7 +152,7 @@ const columns: ColumnDef<Activity>[] = [
   {
     id: "actions",
     header: "",
-    cell: ({ row }) => (
+    cell: () => (
       <Button
         variant="link"
         className="text-green-600 hover:text-green-700 p-0 h-auto text-xs"
