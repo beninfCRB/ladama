@@ -86,7 +86,7 @@ update-k8s-manifest:
   - git config --global user.name "GitLab CI Bot"
   script:
   - echo "Cloning kubernetes repo..."
-  - git clone https://oauth2:${CI_JOB_TOKEN}@gitlab.com/beninfCRB/kubernetes.git
+  - git clone https://oauth2:${K8S_GIT_TOKEN}@gitlab.com/beninfCRB/kubernetes.git
   - cd kubernetes
   - echo "Updating deployment.yaml with new image tag..."
   - >
