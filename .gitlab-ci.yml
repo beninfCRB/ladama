@@ -89,7 +89,8 @@ update-k8s-manifest:
   - git clone https://oauth2:${CI_JOB_TOKEN}@gitlab.com/beninfCRB/kubernetes.git
   - cd kubernetes
   - echo "Updating deployment.yaml with new image tag..."
-  - "sed -i 's|image:.*|image: ${CI_REGISTRY_IMAGE}/react-app:${CI_COMMIT_SHORT_SHA}|g' deployment.yaml"
+  - >
+    sed -i "s|image:.*|image: ${CI_REGISTRY_IMAGE}/react-app:${CI_COMMIT_SHORT_SHA}|g" deployment.yaml
   - git add deployment.yaml
   - git commit -m "Update react-app image to $IMAGE_NAME"
   - git push origin main
