@@ -1,6 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: react-config
-data:
-  API_URL: "https://api.example.com"
