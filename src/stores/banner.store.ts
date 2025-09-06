@@ -1,5 +1,11 @@
 import { createGlobalStore } from "@/lib/globalStore";
 
-export const useBanner = createGlobalStore("banner-informasi", function () {}, [
-  "read",
-]);
+interface BannerTypes {
+  deskripsi?: string;
+}
+
+export const useBanner = createGlobalStore<BannerTypes>(
+  "banner-informasi",
+  function () {},
+  ["read"]
+);

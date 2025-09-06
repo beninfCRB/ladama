@@ -16,9 +16,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/shadcn-io/spinner";
-import { loginSchema } from "@/schemas/login.schema";
+import { loginSchema } from "@/schemas/auth.schema";
 import { useBanner } from "@/stores/banner.store";
-import { useLogin } from "@/stores/login.store";
+import { useLogin } from "@/stores/auth.store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import he from "he";
 import { ArrowLeft, Eye, EyeOff, Mail, MessageCircle } from "lucide-react";
@@ -40,7 +40,7 @@ function AuthLogin() {
   });
 
   function onSubmit(values: z.infer<typeof loginSchema>) {
-    createMutation?.mutateAsync(values);
+    createMutation?.mutate(values);
   }
 
   return (
@@ -149,12 +149,12 @@ function AuthLogin() {
 
           <div className="mt-6 text-center">
             <span className="text-gray-600 text-sm">Belum punya akun? </span>
-            <Button
-              variant="link"
+            <a
+              href="/auth/register"
               className="p-0 h-auto text-green-600 hover:text-green-700 text-sm font-medium"
             >
               Daftar akun
-            </Button>
+            </a>
           </div>
         </div>
 

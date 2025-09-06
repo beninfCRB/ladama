@@ -14,7 +14,7 @@ interface GlobalState {
   setFormMode: (mode: "create" | "update" | null) => void;
 }
 
-function messageError(res?: string | Array<string[]> | Array<string>) {
+const messageError = (res?: string | Array<string[]> | Array<string>) => {
   if (res && typeof res !== "string") {
     res.map((child) => {
       if (typeof child !== "string") {
@@ -24,12 +24,30 @@ function messageError(res?: string | Array<string[]> | Array<string>) {
   } else if (res) {
     toast.error(res);
   }
+};
+
+export interface GlobalStoreProps<T> {
+  query: ReturnType<typeof useQuery<ResponseType<T>>>;
+  createMutation: ReturnType<
+    typeof useMutation<ResponseType<T>, unknown, Partial<T>>
+  >;
+  updateMutation: ReturnType<
+    typeof useMutation<
+      ResponseType<T>,
+      unknown,
+      { id: string | number; payload: Partial<T> }
+    >
+  >;
+  deleteMutation: ReturnType<
+    typeof useMutation<ResponseType<T>, unknown, string | number>
+  >;
+  useGlobalStore: () => GlobalState;
 }
 
 export function createGlobalStore<T>(
   resource: string,
-  callback: (res: ResponseType<T>) => void,
-  allowedMethods: ("read" | "create" | "update" | "delete")[] = [
+  callback?: (res: ResponseType<T>) => void,
+  allowedMethods: Array<"read" | "create" | "update" | "delete"> = [
     "read",
     "create",
     "update",
@@ -43,16 +61,22 @@ export function createGlobalStore<T>(
     setFormMode: (mode) => set({ formMode: mode }),
   }));
 
-  const useCrud = () => {
+  const useCrud = (options?: {
+    id?: string | number;
+    params?: Record<string, undefined>;
+  }) => {
     const queryClient = useQueryClient();
 
-    // Hooks selalu dipanggil, tapi diatur enabled
     const query = useQuery<ResponseType<T>>({
-      queryKey: [resource],
+      queryKey: [resource, options?.id, options?.params],
       queryFn: async () => {
-        const { data } = await useAxios.get<ResponseType<T>>(
-          `${import.meta.env.VITE_PUBLIC_BASE_URL}/${resource}`
-        );
+        const url = options?.id
+          ? `${import.meta.env.VITE_PUBLIC_BASE_URL}/${resource}/${options.id}`
+          : `${import.meta.env.VITE_PUBLIC_BASE_URL}/${resource}`;
+
+        const { data } = await useAxios.get<ResponseType<T>>(url, {
+          params: options?.params,
+        });
         callback?.(data);
         return data;
       },
@@ -125,16 +149,10 @@ export function createGlobalStore<T>(
     });
 
     return {
-      query: allowedMethods.includes("read") ? query : undefined,
-      createMutation: allowedMethods.includes("create")
-        ? createMutation
-        : undefined,
-      updateMutation: allowedMethods.includes("update")
-        ? updateMutation
-        : undefined,
-      deleteMutation: allowedMethods.includes("delete")
-        ? deleteMutation
-        : undefined,
+      query,
+      createMutation,
+      updateMutation,
+      deleteMutation,
       useGlobalStore,
     };
   };
