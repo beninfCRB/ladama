@@ -83,7 +83,7 @@ function AuthLogin() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Email</FormLabel>
-                      <FormControl className="h-12">
+                      <FormControl className="h-10">
                         <Input placeholder="user@example.com" {...field} />
                       </FormControl>
                       <FormMessage />
@@ -98,13 +98,13 @@ function AuthLogin() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Password</FormLabel>
-                      <div className="h-12 relative">
+                      <div className="h-10 relative">
                         <FormControl>
                           <Input
                             id="password"
                             type={showPassword ? "text" : "password"}
                             {...field}
-                            className="pr-10 h-12"
+                            className="pr-10 h-10"
                             placeholder="example"
                           />
                         </FormControl>

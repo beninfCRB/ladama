@@ -45,7 +45,7 @@ export function ProtectedRoute() {
         </TypingAnimation>
         <ShinyButton
           className="h-12 bg-green-600 hover:bg-green-700 text-white rounded-lg text-2xl font-extrabold flex items-center justify-center"
-          onClick={() => navigate("/login")}
+          onClick={() => navigate("/auth/login")}
         >
           Log In
         </ShinyButton>

@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import logo from "@/assets/logo.svg";
+import { handleLogout } from "@/handlers/auth/login.handler";
 
 function HeaderGroup() {
   return (
@@ -27,7 +28,7 @@ function HeaderGroup() {
               KELOMPOK PENANAMAN MANGROVE
             </span>
           </div>
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" onClick={handleLogout}>
             Log Out
           </Button>
         </div>

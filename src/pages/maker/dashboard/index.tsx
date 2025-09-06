@@ -1,4 +1,4 @@
-import { HyperText } from "@/components/magicui/hyper-text";
+import { TypingAnimation } from "@/components/magicui/typing-animation";
 import ActivityHistory from "@/components/modules/dashboard/maker/ActivityHistory";
 import CreateSubmissionSection from "@/components/modules/dashboard/maker/CreateSubmissionSection";
 import DraftSubmissionSection from "@/components/modules/dashboard/maker/DraftSubmissionSection";
@@ -6,8 +6,8 @@ import ProgressSubmissionSection from "@/components/modules/dashboard/maker/Prog
 import HeaderGroup from "@/components/modules/HeaderGroup";
 import MobileHeader from "@/components/modules/MobileHeader";
 import SidebarNavigation from "@/components/modules/SidebarNavigation";
-import { useEffect, useState } from "react";
 import moment from "moment";
+import { useEffect, useState } from "react";
 
 function DashboardPage() {
   const [date, setDate] = useState(moment());
@@ -32,9 +32,9 @@ function DashboardPage() {
             <div className="flex items-center gap-2">
               <span className="text-gray-600">🏠</span>
               <span className="text-gray-600">Halo,</span>
-              <HyperText className="font-semibold text-[#10a249] text-md">
+              <TypingAnimation className="font-semibold text-[#10a249] text-md">
                 KELOMPOK PENANAMAN MANGROVE
-              </HyperText>
+              </TypingAnimation>
             </div>
             <p className="text-sm font-medium text-yellow-500">
               {date.format("DD MMMM YYYY, HH:mm:ss")}

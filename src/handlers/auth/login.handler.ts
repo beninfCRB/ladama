@@ -16,7 +16,7 @@ async function handleLogin(res?: ResponseType<UserType>) {
 }
 async function handleLogout() {
   removeStorage();
-  window.location.replace("/login");
+  window.location.replace("/auth/login");
 }
 
 function setStorage(res?: ResponseType<UserType>) {

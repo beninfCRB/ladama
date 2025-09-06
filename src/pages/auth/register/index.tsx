@@ -22,6 +22,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import type z from "zod";
 import logo from "@/assets/logo.svg";
+import { Input } from "@/components/ui/input";
 
 const navigationSteps = [
   {
@@ -238,7 +239,7 @@ function AuthRegister() {
                   <Form {...form}>
                     <form
                       onSubmit={form.handleSubmit(onSubmit)}
-                      className="space-y-6"
+                      className="space-y-6 mb-4"
                     >
                       <div className="space-y-2">
                         <FormField
@@ -247,7 +248,7 @@ function AuthRegister() {
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>
-                                Jenis Kelompok{" "}
+                                Jenis Kelompok
                                 <span className="text-red-500">*</span>
                               </FormLabel>
                               <FormControl>
@@ -256,6 +257,28 @@ function AuthRegister() {
                                   data={jenisKelompok.data?.data}
                                   fieldSetValue="id"
                                   fieldName="jenis_kelompok_masyarakat"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <FormField
+                          control={form.control}
+                          name="kelompok_masyarakat"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>
+                                Kelompok Masyarakat
+                                <span className="text-red-500">*</span>
+                              </FormLabel>
+                              <FormControl className="h-10">
+                                <Input
+                                  placeholder="Kelompok masyarakat"
                                   {...field}
                                 />
                               </FormControl>
@@ -337,7 +360,7 @@ function AuthRegister() {
                   <div className="text-center text-sm">
                     <span className="text-gray-600">Sudah punya akun? </span>
                     <a
-                      href="/login"
+                      href="/auth/login"
                       className="text-green-600 hover:underline font-medium"
                     >
                       Login

@@ -37,7 +37,12 @@ const CustomSelect = <T extends object>({
       value={value ? String(value) : ""}
       disabled={disabled}
     >
-      <SelectTrigger ref={ref} name={name} onBlur={onBlur} className="w-full">
+      <SelectTrigger
+        ref={ref}
+        name={name}
+        onBlur={onBlur}
+        className="h-24 w-full"
+      >
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent>
