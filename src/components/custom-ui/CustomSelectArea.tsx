@@ -27,6 +27,7 @@ function CustomSelectArea({ form }: customSelectArea) {
   const kecamatanId = watch("kecamatan_kelompok_masyarakat_id");
   const prevProvinsiId = usePrevious(provinsiId);
   const prevKotaId = usePrevious(kotaId);
+  const prevKecamatanId = usePrevious(kecamatanId);
 
   const { query: provinsi } = useProvinsi();
   const { query: kota } = useKota(provinsiId);
@@ -57,7 +58,7 @@ function CustomSelectArea({ form }: customSelectArea) {
   }, [kotaId, prevKotaId]);
 
   useEffect(() => {
-    if (!kecamatanId) {
+    if (kecamatanId && kecamatanId !== prevKecamatanId) {
       resetField("kelurahan_kelompok_masyarakat_id");
     }
   }, [kecamatanId]);

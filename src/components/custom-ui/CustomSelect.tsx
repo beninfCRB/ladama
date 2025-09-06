@@ -20,6 +20,7 @@ const CustomSelect = <T extends object>({
   fieldName,
   data,
   value,
+  disabled,
   onChange,
   onBlur,
   name,
@@ -31,7 +32,11 @@ const CustomSelect = <T extends object>({
   }));
 
   return (
-    <Select onValueChange={onChange} value={value ? String(value) : ""}>
+    <Select
+      onValueChange={onChange}
+      value={value ? String(value) : ""}
+      disabled={disabled}
+    >
       <SelectTrigger ref={ref} name={name} onBlur={onBlur} className="w-full">
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
