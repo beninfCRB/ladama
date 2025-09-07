@@ -1,5 +1,10 @@
+import logo from "@/assets/logo.svg";
 import CustomSelect from "@/components/custom-ui/CustomSelect";
 import CustomSelectArea from "@/components/custom-ui/CustomSelectArea";
+import FileUploadField from "@/components/custom-ui/FileUploadField";
+import RequiredLabel from "@/components/custom-ui/RequiredLabel";
+import { InteractiveHoverButton } from "@/components/magicui/interactive-hover-button";
+import { ShinyButton } from "@/components/magicui/shiny-button";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -7,22 +12,24 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/shadcn-io/spinner";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
-import { registerSchema } from "@/schemas/auth.schema";
+import { convertToFormData } from "@/lib/convertToFormData";
+import { registerSchema, type registerFormType } from "@/schemas/auth.schema";
+import { useRegister } from "@/stores/auth.store";
 import {
   useJenisKelompok,
   type JenisKelompokStoreTypes,
-} from "@/stores/register.store";
+} from "@/stores/jenisKelompok.store";
+import type { JenisKelamin } from "@/types/static";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Check, ChevronRight, CreditCard, FileText, Users } from "lucide-react";
+import { Check, CreditCard, FileText, Users } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import type z from "zod";
-import logo from "@/assets/logo.svg";
-import { Input } from "@/components/ui/input";
 
 const navigationSteps = [
   {
@@ -50,24 +57,98 @@ const navigationSteps = [
 
 function AuthRegister() {
   const { query: jenisKelompok } = useJenisKelompok();
+  const { createMutation } = useRegister();
   const [activeTab, setActiveTab] = useState("step1");
 
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
       jenis_kelompok_masyarakat_id: "",
+      kelompok_masyarakat: "",
+      profil_kelompok: null,
+      foto_ktp: null,
+      nama_pic: "",
+      nomor_identitas_pic: "",
+      nomor_npwp_pic: "",
+      alamat_pic: "",
+      provinsi_pic: "",
+      kecamatan_pic: "",
+      kelurahan_pic: "",
+      tempat_lahir: "",
+      tanggal_lahir: "",
+      agama_id: "",
+      status_perkawinan_id: "",
+      nama_gadis_ibu_kandung: "",
+      jenis_pekerjaan_id: "",
+      nohp_pic: "",
+      email_pic: "",
+      kode_aktivasi: "",
+      provinsi_kelompok_masyarakat_id: "",
+      kabupaten_kelompok_masyarakat_id: "",
+      kecamatan_kelompok_masyarakat_id: "",
+      kelurahan_kelompok_masyarakat_id: "",
+      pendidikan: "",
+      jenis_kelamin: "",
+      nama_kontak_darurat: "",
+      nomor_kontak_darurat: "",
     },
   });
 
   function onSubmit(values: z.infer<typeof registerSchema>) {}
 
-  // const handleFileChange =
-  //   (field: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
-  //     const file = event.target.files?.[0] || null;
-  //     form.setValue((prev) => ({ ...prev, [field]: file }));
-  //   };
+  const handleTabChange = async (value: string) => {
+    if (activeTab === "step1") {
+      const isValid = await form.trigger([
+        "jenis_kelompok_masyarakat_id",
+        "kelompok_masyarakat",
+        "profil_kelompok",
+        "provinsi_kelompok_masyarakat_id",
+        "kabupaten_kelompok_masyarakat_id",
+        "kecamatan_kelompok_masyarakat_id",
+        "kelurahan_kelompok_masyarakat_id",
+      ]);
+      if (isValid) {
+        setActiveTab(value);
+      }
+    } else if (activeTab === "step2") {
+      const isValid = await form.trigger([
+        "nama_pic",
+        "nomor_identitas_pic",
+        "nomor_npwp_pic",
+        "provinsi_pic",
+        "kecamatan_pic",
+        "kelurahan_pic",
+        "tempat_lahir",
+        "tanggal_lahir",
+        "jenis_kelamin",
+        "alamat_pic",
+        "nohp_pic",
+        "email_pic",
+        "nomor_kontak_darurat",
+        "nama_kontak_darurat",
+        "kode_aktivasi",
+      ]);
+      if (isValid) {
+        const values = form.getValues();
+        const formData = convertToFormData<registerFormType>(values);
 
-  const handleTabChange = (value: string) => {
+        createMutation.mutate(formData, {
+          onSuccess: () => {
+            setActiveTab("step3");
+          },
+        });
+      }
+    } else if (activeTab === "step3") {
+      const isValid = await form.trigger(["foto_ktp"]);
+      if (isValid) {
+        const values = form.getValues();
+        const formData = convertToFormData<registerFormType>(values);
+        createMutation.mutate(formData);
+      }
+    }
+  };
+
+  const goBack = (value: string) => {
     setActiveTab(value);
   };
 
@@ -102,14 +183,15 @@ function AuthRegister() {
                 className="flex flex-col items-center relative z-10"
               >
                 <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 cursor-pointer ${
+                  className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 
+                  ${
                     isCompleted
                       ? "bg-green-500 text-white"
                       : isActive
                       ? "bg-green-500 text-white"
                       : "bg-gray-200 text-gray-400"
-                  }`}
-                  onClick={() => handleTabChange(`step${step.id}`)}
+                  }
+                  pointer-events-none`}
                 >
                   {isCompleted ? (
                     <Check className="w-4 h-4" />
@@ -119,10 +201,9 @@ function AuthRegister() {
                 </div>
                 <div className="mt-2 text-center">
                   <div
-                    className={`text-xs font-medium cursor-pointer ${
-                      isActive ? "text-green-600" : "text-gray-500"
-                    }`}
-                    onClick={() => handleTabChange(`step${step.id}`)}
+                    className={`text-xs font-medium 
+                    ${isActive ? "text-green-600" : "text-gray-500"}
+                    pointer-events-none`}
                   >
                     {step.title}
                   </div>
@@ -247,10 +328,9 @@ function AuthRegister() {
                           name="jenis_kelompok_masyarakat_id"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>
+                              <RequiredLabel required>
                                 Jenis Kelompok
-                                <span className="text-red-500">*</span>
-                              </FormLabel>
+                              </RequiredLabel>
                               <FormControl>
                                 <CustomSelect<JenisKelompokStoreTypes>
                                   placeholder="Pilih jenis kelompok"
@@ -272,14 +352,18 @@ function AuthRegister() {
                           name="kelompok_masyarakat"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>
+                              <RequiredLabel required>
                                 Kelompok Masyarakat
-                                <span className="text-red-500">*</span>
-                              </FormLabel>
+                              </RequiredLabel>
                               <FormControl className="h-10">
                                 <Input
-                                  placeholder="Kelompok masyarakat"
                                   {...field}
+                                  type="text"
+                                  placeholder="Masukkan kelompok masyarakat"
+                                  value={field.value || ""}
+                                  onChange={(e) =>
+                                    field.onChange(e.target.value.toUpperCase())
+                                  }
                                 />
                               </FormControl>
                               <FormMessage />
@@ -288,71 +372,31 @@ function AuthRegister() {
                         />
                       </div>
 
-                      <CustomSelectArea form={form} />
+                      <CustomSelectArea<registerFormType>
+                        form={form}
+                        required
+                        provinsiField="provinsi_kelompok_masyarakat_id"
+                        kabupatenField="kabupaten_kelompok_masyarakat_id"
+                        kecamatanField="kecamatan_kelompok_masyarakat_id"
+                        kelurahanField="kelurahan_kelompok_masyarakat_id"
+                      />
 
-                      {/* <div className="space-y-2">
-                        <Label
-                          htmlFor="kelompokMasyarakat"
-                          className="text-sm font-medium"
+                      <FileUploadField
+                        name="profil_kelompok"
+                        control={form.control}
+                        label="Unggah Dokumen Profil"
+                        mode="document"
+                        description="(Format: PDF, DOC, DOCX, Max 10 MB)"
+                      />
+
+                      <div className="flex items-center justify-center">
+                        <InteractiveHoverButton
+                          className="bg-green-600 hover:bg-green-700 text-white rounded-md h-10 w-2/4 flex items-center justify-center font-medium"
+                          onClick={() => handleTabChange("step2")}
                         >
-                          Kelompok masyarakat{" "}
-                          <span className="text-red-500">*</span>
-                        </Label>
-                        <Input
-                          id="kelompokMasyarakat"
-                          className="w-full"
-                          placeholder="Masukkan nama kelompok masyarakat"
-                          value={formData.kelompokMasyarakat}
-                          onChange={(e) =>
-                            handleInputChange(
-                              "kelompokMasyarakat",
-                              e.target.value
-                            )
-                          }
-                        />
+                          Berikutnya
+                        </InteractiveHoverButton>
                       </div>
-
-
-                      <div className="space-y-2">
-                        <Label
-                          htmlFor="profilFile"
-                          className="text-sm font-medium"
-                        >
-                          Unggah Profil Kelompok{" "}
-                          <span className="text-red-500">*</span>
-                        </Label>
-                        <div className="text-xs text-gray-500 mb-2">
-                          (Tipe file .docx, .doc, .pdf, Maksimal 10 MB)
-                        </div>
-                        <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 lg:p-6 text-center hover:border-gray-400 transition-colors">
-                          <input
-                            type="file"
-                            id="profilFile"
-                            className="hidden"
-                            accept=".docx,.doc,.pdf"
-                            onChange={handleFileChange("profilFile")}
-                          />
-                          <label
-                            htmlFor="profilFile"
-                            className="cursor-pointer"
-                          >
-                            <Upload className="w-6 h-6 lg:w-8 lg:h-8 text-gray-400 mx-auto mb-2" />
-                            <p className="text-sm text-gray-600">
-                              {formData.profilFile
-                                ? formData.profilFile.name
-                                : "Klik untuk mengunggah file"}
-                            </p>
-                          </label>
-                        </div>
-                      </div> */}
-
-                      <Button
-                        className="w-full bg-green-600 hover:bg-green-700 text-white h-11 lg:h-12"
-                        onClick={() => handleTabChange("step2")}
-                      >
-                        Berikutnya
-                        <ChevronRight className="w-4 h-4 ml-2" />
-                      </Button>
                     </form>
                   </Form>
 
@@ -370,229 +414,388 @@ function AuthRegister() {
               </TabsContent>
 
               {/* Step 2: Detail Penanggung Jawab */}
-              {/* <TabsContent value="step2" className="mt-0">
-                <CardContent className="space-y-6">
-                  <div className="space-y-2">
-                    <Label
-                      htmlFor="namaLengkap"
-                      className="text-sm font-medium"
+              <TabsContent value="step2" className="mt-0">
+                <CardContent>
+                  <Form {...form}>
+                    <form
+                      onSubmit={form.handleSubmit(onSubmit)}
+                      className="space-y-6 mb-4"
                     >
-                      Nama Lengkap <span className="text-red-500">*</span>
-                    </Label>
-                    <Input
-                      id="namaLengkap"
-                      className="w-full"
-                      placeholder="Masukkan nama lengkap"
-                      value={formData.namaLengkap}
-                      onChange={(e) =>
-                        handleInputChange("namaLengkap", e.target.value)
-                      }
-                    />
-                  </div>
+                      <div className="space-y-2">
+                        <FormField
+                          name="nama_pic"
+                          control={form.control}
+                          render={({ field }) => (
+                            <FormItem>
+                              <RequiredLabel required>
+                                Nama Lengkap{" "}
+                              </RequiredLabel>
+                              <FormControl className="h-10">
+                                <Input
+                                  placeholder="Masukkan nama lengkap"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="nik" className="text-sm font-medium">
-                      NIK <span className="text-red-500">*</span>
-                    </Label>
-                    <Input
-                      id="nik"
-                      className="w-full"
-                      placeholder="Masukkan NIK"
-                      value={formData.nik}
-                      onChange={(e) => handleInputChange("nik", e.target.value)}
-                    />
-                  </div>
+                      <div className="space-y-2">
+                        <FormField
+                          name="nomor_identitas_pic"
+                          control={form.control}
+                          render={({ field }) => (
+                            <FormItem>
+                              <RequiredLabel required>NIK</RequiredLabel>
+                              <FormControl className="h-10">
+                                <Input
+                                  {...field}
+                                  placeholder="Masukkan NIK"
+                                  inputMode="numeric"
+                                  pattern="[0-9]*"
+                                  maxLength={16}
+                                  value={field.value || ""}
+                                  onChange={(e) => {
+                                    const numericValue = e.target.value.replace(
+                                      /\D/g,
+                                      ""
+                                    );
+                                    field.onChange(numericValue);
+                                  }}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label
-                        htmlFor="tempatLahir"
-                        className="text-sm font-medium"
-                      >
-                        Tempat Lahir <span className="text-red-500">*</span>
-                      </Label>
-                      <Input
-                        id="tempatLahir"
-                        className="w-full"
-                        placeholder="Tempat lahir"
-                        value={formData.tempatLahir}
-                        onChange={(e) =>
-                          handleInputChange("tempatLahir", e.target.value)
-                        }
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label
-                        htmlFor="tanggalLahir"
-                        className="text-sm font-medium"
-                      >
-                        Tanggal Lahir <span className="text-red-500">*</span>
-                      </Label>
-                      <Input
-                        id="tanggalLahir"
-                        type="date"
-                        className="w-full"
-                        value={formData.tanggalLahir}
-                        onChange={(e) =>
-                          handleInputChange("tanggalLahir", e.target.value)
-                        }
-                      />
-                    </div>
-                  </div>
+                      <div className="space-y-2">
+                        <FormField
+                          name="nomor_npwp_pic"
+                          control={form.control}
+                          render={({ field }) => (
+                            <FormItem>
+                              <RequiredLabel required>NPWP</RequiredLabel>
+                              <FormControl className="h-10">
+                                <Input
+                                  {...field}
+                                  placeholder="Masukkan NPWP"
+                                  inputMode="numeric"
+                                  pattern="[0-9]*"
+                                  maxLength={16}
+                                  value={field.value || ""}
+                                  onChange={(e) => {
+                                    const numericValue = e.target.value.replace(
+                                      /\D/g,
+                                      ""
+                                    );
+                                    field.onChange(numericValue);
+                                  }}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
 
-                  <div className="space-y-2">
-                    <Label
-                      htmlFor="jenisKelamin"
-                      className="text-sm font-medium"
-                    >
-                      Jenis Kelamin <span className="text-red-500">*</span>
-                    </Label>
-                    <Select
-                      value={formData.jenisKelamin}
-                      onValueChange={(value) =>
-                        handleInputChange("jenisKelamin", value)
-                      }
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Pilih jenis kelamin" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="laki-laki">Laki-laki</SelectItem>
-                        <SelectItem value="perempuan">Perempuan</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <FormField
+                            name="tempat_lahir"
+                            control={form.control}
+                            render={({ field }) => (
+                              <FormItem>
+                                <RequiredLabel required>
+                                  Tempat Lahir{" "}
+                                </RequiredLabel>
+                                <FormControl className="h-10">
+                                  <Input
+                                    placeholder="Tempat lahir"
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <FormField
+                            name="tanggal_lahir"
+                            control={form.control}
+                            render={({ field }) => (
+                              <FormItem>
+                                <RequiredLabel required>
+                                  Tanggal Lahir{" "}
+                                </RequiredLabel>
+                                <FormControl className="h-10">
+                                  <Input type="date" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="alamat" className="text-sm font-medium">
-                      Alamat <span className="text-red-500">*</span>
-                    </Label>
-                    <Input
-                      id="alamat"
-                      className="w-full"
-                      placeholder="Masukkan alamat lengkap"
-                      value={formData.alamat}
-                      onChange={(e) =>
-                        handleInputChange("alamat", e.target.value)
-                      }
-                    />
-                  </div>
+                      <div className="space-y-2">
+                        <FormField
+                          name="jenis_kelamin"
+                          control={form.control}
+                          render={({ field }) => (
+                            <FormItem>
+                              <RequiredLabel required>
+                                Jenis Kelamin{" "}
+                              </RequiredLabel>
+                              <FormControl className="h-10">
+                                <CustomSelect<JenisKelamin>
+                                  placeholder="Pilih jenis kelamin"
+                                  data={[
+                                    { id: "laki-laki", name: "Laki-Laki" },
+                                    { id: "perempuan", name: "Perempuan" },
+                                  ]}
+                                  fieldSetValue="id"
+                                  fieldName="name"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label
-                        htmlFor="noTelepon"
-                        className="text-sm font-medium"
-                      >
-                        No. Telepon <span className="text-red-500">*</span>
-                      </Label>
-                      <Input
-                        id="noTelepon"
-                        className="w-full"
-                        placeholder="Masukkan nomor telepon"
-                        value={formData.noTelepon}
-                        onChange={(e) =>
-                          handleInputChange("noTelepon", e.target.value)
-                        }
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="email" className="text-sm font-medium">
-                        Email <span className="text-red-500">*</span>
-                      </Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        className="w-full"
-                        placeholder="Masukkan email"
-                        value={formData.email}
-                        onChange={(e) =>
-                          handleInputChange("email", e.target.value)
-                        }
-                      />
-                    </div>
-                  </div>
+                      <div className="space-y-2">
+                        <FormField
+                          name="alamat_pic"
+                          control={form.control}
+                          render={({ field }) => (
+                            <FormItem>
+                              <RequiredLabel required>Alamat</RequiredLabel>
+                              <FormControl className="h-10">
+                                <Input
+                                  placeholder="Masukkan alamat lengkap"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
 
-                  <div className="flex gap-4">
-                    <Button
-                      variant="outline"
-                      className="flex-1 bg-transparent"
-                      onClick={() => handleTabChange("step1")}
-                    >
-                      Kembali
-                    </Button>
-                    <Button
-                      className="flex-1 bg-green-600 hover:bg-green-700 text-white"
-                      onClick={() => handleTabChange("step3")}
-                    >
-                      Berikutnya
-                      <ChevronRight className="w-4 h-4 ml-2" />
-                    </Button>
-                  </div>
+                      <div className="space-y-2">
+                        <FormField
+                          name="nohp_pic"
+                          control={form.control}
+                          render={({ field }) => (
+                            <FormItem>
+                              <RequiredLabel required>
+                                No. Telepon{" "}
+                              </RequiredLabel>
+                              <FormControl className="h-10">
+                                <Input
+                                  {...field}
+                                  placeholder="Masukkan nomor telepon"
+                                  inputMode="numeric"
+                                  pattern="[0-9]*"
+                                  maxLength={16}
+                                  value={field.value || ""}
+                                  onChange={(e) => {
+                                    const numericValue = e.target.value.replace(
+                                      /\D/g,
+                                      ""
+                                    );
+                                    field.onChange(numericValue);
+                                  }}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <FormField
+                            name="nama_kontak_darurat"
+                            control={form.control}
+                            render={({ field }) => (
+                              <FormItem>
+                                <RequiredLabel required>
+                                  Nama Kontak Darurat
+                                </RequiredLabel>
+                                <FormControl className="h-10">
+                                  <Input
+                                    placeholder="Masukkan nama kontak darurat"
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <FormField
+                            name="nomor_kontak_darurat"
+                            control={form.control}
+                            render={({ field }) => (
+                              <FormItem>
+                                <RequiredLabel required>
+                                  No. Kontak Darurat
+                                </RequiredLabel>
+                                <FormControl className="h-10">
+                                  <Input
+                                    {...field}
+                                    placeholder="Masukkan nomor kontak darurat"
+                                    inputMode="numeric"
+                                    pattern="[0-9]*"
+                                    maxLength={16}
+                                    value={field.value || ""}
+                                    onChange={(e) => {
+                                      const numericValue =
+                                        e.target.value.replace(/\D/g, "");
+                                      field.onChange(numericValue);
+                                    }}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <FormField
+                            name="email_pic"
+                            control={form.control}
+                            render={({ field }) => (
+                              <FormItem>
+                                <RequiredLabel required>Email</RequiredLabel>
+                                <FormControl className="h-10">
+                                  <Input
+                                    type="email"
+                                    placeholder="Masukkan email"
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <FormField
+                            name="kode_aktivasi"
+                            control={form.control}
+                            render={({ field }) => (
+                              <FormItem>
+                                <RequiredLabel required>
+                                  Kode Aktivasi
+                                </RequiredLabel>
+                                <div className="flex gap-2">
+                                  <FormControl className="h-10 flex-1">
+                                    <Input
+                                      placeholder="Masukkan kode aktivasi"
+                                      maxLength={6}
+                                      {...field}
+                                    />
+                                  </FormControl>
+                                  <ShinyButton
+                                    type="button"
+                                    className="h-10 px-4 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg font-semibold"
+                                    onClick={() => {
+                                      const kode =
+                                        form.getValues("kode_aktivasi");
+                                      if (!kode) {
+                                        form.setError("kode_aktivasi", {
+                                          message: "Kode aktivasi wajib diisi",
+                                        });
+                                        return;
+                                      }
+                                      // TODO: panggil API verifikasi kode aktivasi
+                                      console.log(
+                                        "Verifikasi kode aktivasi:",
+                                        kode
+                                      );
+                                    }}
+                                  >
+                                    Verifikasi
+                                  </ShinyButton>
+                                </div>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex gap-4 mt-4">
+                        <Button
+                          variant="outline"
+                          className="w-1/2 bg-transparent h-10"
+                          onClick={() => handleTabChange("step1")}
+                        >
+                          Kembali
+                        </Button>
+                        <InteractiveHoverButton
+                          className="bg-green-600 hover:bg-green-700 text-white rounded-md h-10 w-1/2 flex items-center justify-center font-medium"
+                          onClick={() => goBack("step2")}
+                        >
+                          Berikutnya
+                        </InteractiveHoverButton>
+                      </div>
+                    </form>
+                  </Form>
                 </CardContent>
-              </TabsContent> */}
+              </TabsContent>
 
               {/* Step 3: Unggah KTP */}
-              {/* <TabsContent value="step3" className="mt-0">
-                <CardContent className="space-y-6">
-                  <div className="text-center space-y-4">
-                    <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
-                      <CreditCard className="w-8 h-8 text-green-600" />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900">
-                        Unggah KTP Penanggung Jawab
-                      </h3>
-                      <p className="text-sm text-gray-600 mt-2">
-                        Silakan unggah foto atau scan KTP penanggung jawab
-                        kelompok/perorangan
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="ktpFile" className="text-sm font-medium">
-                      File KTP <span className="text-red-500">*</span>
-                    </Label>
-                    <div className="text-xs text-gray-500 mb-2">
-                      (Tipe file .jpg, .jpeg, .png, .pdf, Maksimal 5 MB)
-                    </div>
-                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-gray-400 transition-colors">
-                      <input
-                        type="file"
-                        id="ktpFile"
-                        className="hidden"
-                        accept=".jpg,.jpeg,.png,.pdf"
-                        onChange={handleFileChange("ktpFile")}
-                      />
-                      <label htmlFor="ktpFile" className="cursor-pointer">
-                        <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                        <p className="text-sm text-gray-600 mb-2">
-                          {formData.ktpFile
-                            ? formData.ktpFile.name
-                            : "Klik untuk mengunggah file KTP"}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          Pastikan foto KTP jelas dan dapat dibaca
-                        </p>
-                      </label>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-4">
-                    <Button
-                      variant="outline"
-                      className="flex-1 bg-transparent"
-                      onClick={() => handleTabChange("step2")}
+              <TabsContent value="step3" className="mt-0">
+                <CardContent>
+                  <Form {...form}>
+                    <form
+                      onSubmit={form.handleSubmit(onSubmit)}
+                      className="space-y-6 mb-4"
                     >
-                      Kembali
-                    </Button>
-                    <Button className="flex-1 bg-green-600 hover:bg-green-700 text-white">
-                      Selesai & Daftar
-                    </Button>
-                  </div>
+                      <FileUploadField
+                        name="foto_ktp"
+                        control={form.control}
+                        label="Unggah Foto Profil"
+                        mode="image"
+                        description="(Format: JPG, PNG, GIF, Max 5 MB)"
+                      />
+
+                      <div className="flex gap-4 mt-4">
+                        <Button
+                          variant="outline"
+                          className="flex-1 bg-transparent h-10 w-1/2"
+                          onClick={() => goBack("step2")}
+                        >
+                          Kembali
+                        </Button>
+                        <ShinyButton className="h-10 bg-green-600 hover:bg-green-700 text-white rounded-lg text-2xl font-extrabold items-center justify-center flex w-1/2">
+                          {createMutation?.isPending ? (
+                            <div className="flex items-center justify-center">
+                              <Spinner className="text-white" size={20} />
+                            </div>
+                          ) : (
+                            "Daftar Sekarang"
+                          )}
+                        </ShinyButton>
+                      </div>
+                    </form>
+                  </Form>
                 </CardContent>
-              </TabsContent> */}
+              </TabsContent>
             </Tabs>
           </Card>
         </div>

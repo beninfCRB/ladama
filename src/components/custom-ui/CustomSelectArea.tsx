@@ -1,4 +1,3 @@
-import { type registerFormType } from "@/schemas/auth.schema";
 import {
   useKecamatan,
   useKelurahan,
@@ -7,24 +6,33 @@ import {
   type AreaStoreTypes,
 } from "@/stores/area.store";
 import { useEffect, useRef } from "react";
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "../ui/form";
+import type { FieldValues, Path, UseFormReturn } from "react-hook-form";
+import { FormControl, FormField, FormItem, FormMessage } from "../ui/form";
 import CustomSelect from "./CustomSelect";
+import RequiredLabel from "./RequiredLabel";
 
-interface customSelectArea {
-  form: registerFormType;
+interface CustomSelectAreaProps<T extends FieldValues> {
+  form: UseFormReturn<T>;
+  required: boolean;
+  provinsiField: Path<T>;
+  kabupatenField: Path<T>;
+  kecamatanField: Path<T>;
+  kelurahanField: Path<T>;
 }
 
-function CustomSelectArea({ form }: customSelectArea) {
+function CustomSelectArea<T extends FieldValues>({
+  form,
+  required,
+  provinsiField,
+  kabupatenField,
+  kecamatanField,
+  kelurahanField,
+}: CustomSelectAreaProps<T>) {
   const { watch, resetField } = form;
-  const provinsiId = watch("provinsi_kelompok_masyarakat_id");
-  const kotaId = watch("kabupaten_kelompok_masyarakat_id");
-  const kecamatanId = watch("kecamatan_kelompok_masyarakat_id");
+  const provinsiId = watch(provinsiField);
+  const kotaId = watch(kabupatenField);
+  const kecamatanId = watch(kecamatanField);
+
   const prevProvinsiId = usePrevious(provinsiId);
   const prevKotaId = usePrevious(kotaId);
   const prevKecamatanId = usePrevious(kecamatanId);
@@ -34,8 +42,8 @@ function CustomSelectArea({ form }: customSelectArea) {
   const { query: kecamatan } = useKecamatan(kotaId);
   const { query: kelurahan } = useKelurahan(kecamatanId);
 
-  function usePrevious<T>(value: T): T | undefined {
-    const ref = useRef<T | undefined>(undefined);
+  function usePrevious<U>(value: U): U | undefined {
+    const ref = useRef<U | undefined>(undefined);
     useEffect(() => {
       ref.current = value;
     }, [value]);
@@ -44,24 +52,31 @@ function CustomSelectArea({ form }: customSelectArea) {
 
   useEffect(() => {
     if (provinsiId && provinsiId !== prevProvinsiId) {
-      resetField("kabupaten_kelompok_masyarakat_id");
-      resetField("kecamatan_kelompok_masyarakat_id");
-      resetField("kelurahan_kelompok_masyarakat_id");
+      resetField(kabupatenField);
+      resetField(kecamatanField);
+      resetField(kelurahanField);
     }
-  }, [provinsiId, prevProvinsiId]);
+  }, [
+    provinsiId,
+    prevProvinsiId,
+    resetField,
+    kabupatenField,
+    kecamatanField,
+    kelurahanField,
+  ]);
 
   useEffect(() => {
     if (kotaId && kotaId !== prevKotaId) {
-      resetField("kecamatan_kelompok_masyarakat_id");
-      resetField("kelurahan_kelompok_masyarakat_id");
+      resetField(kecamatanField);
+      resetField(kelurahanField);
     }
-  }, [kotaId, prevKotaId]);
+  }, [kotaId, prevKotaId, resetField, kecamatanField, kelurahanField]);
 
   useEffect(() => {
     if (kecamatanId && kecamatanId !== prevKecamatanId) {
-      resetField("kelurahan_kelompok_masyarakat_id");
+      resetField(kelurahanField);
     }
-  }, [kecamatanId]);
+  }, [kecamatanId, prevKecamatanId, resetField, kelurahanField]);
 
   return (
     <>
@@ -69,12 +84,10 @@ function CustomSelectArea({ form }: customSelectArea) {
         <div className="space-y-2">
           <FormField
             control={form.control}
-            name="provinsi_kelompok_masyarakat_id"
+            name={provinsiField}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>
-                  Provinsi <span className="text-red-500">*</span>
-                </FormLabel>
+                <RequiredLabel required={required}>Provinsi</RequiredLabel>
                 <FormControl>
                   <CustomSelect<AreaStoreTypes>
                     placeholder="Pilih provinsi"
@@ -92,12 +105,12 @@ function CustomSelectArea({ form }: customSelectArea) {
         <div className="space-y-2">
           <FormField
             control={form.control}
-            name="kabupaten_kelompok_masyarakat_id"
+            name={kabupatenField}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>
-                  Kabupaten/Kota <span className="text-red-500">*</span>
-                </FormLabel>
+                <RequiredLabel required={required}>
+                  Kabupaten/Kota
+                </RequiredLabel>
                 <FormControl>
                   <CustomSelect<AreaStoreTypes>
                     placeholder="Pilih kabupaten/kota"
@@ -119,12 +132,10 @@ function CustomSelectArea({ form }: customSelectArea) {
         <div className="space-y-2">
           <FormField
             control={form.control}
-            name="kecamatan_kelompok_masyarakat_id"
+            name={kecamatanField}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>
-                  Kecamatan <span className="text-red-500">*</span>
-                </FormLabel>
+                <RequiredLabel required={required}>Kecamatan</RequiredLabel>
                 <FormControl>
                   <CustomSelect<AreaStoreTypes>
                     placeholder="Pilih kecamatan"
@@ -143,12 +154,10 @@ function CustomSelectArea({ form }: customSelectArea) {
         <div className="space-y-2">
           <FormField
             control={form.control}
-            name="kelurahan_kelompok_masyarakat_id"
+            name={kelurahanField}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>
-                  Kelurahan <span className="text-red-500">*</span>
-                </FormLabel>
+                <RequiredLabel required={required}>Kelurahan</RequiredLabel>
                 <FormControl>
                   <CustomSelect<AreaStoreTypes>
                     placeholder="Pilih kelurahan"

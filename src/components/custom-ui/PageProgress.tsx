@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Progress } from "@/components/ui/progress";
 import { NumberTicker } from "@/components/magicui/number-ticker";
 
-export function PageProgress() {
+function PageProgress() {
   const [progress, setProgress] = useState(0);
   const [loading, setLoading] = useState(true);
 
@@ -49,3 +49,5 @@ export function PageProgress() {
     </div>
   );
 }
+
+export default PageProgress;

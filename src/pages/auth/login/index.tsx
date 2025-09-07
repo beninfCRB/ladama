@@ -135,7 +135,7 @@ function AuthLogin() {
                   </Button>
                 </div>
               </div>
-              <ShinyButton className="w-full h-12 bg-green-600 hover:bg-green-700 text-white rounded-lg text-2xl font-extrabold items-center justify-center flex">
+              <ShinyButton className="w-full h-10 bg-green-600 hover:bg-green-700 text-white rounded-lg text-2xl font-extrabold items-center justify-center flex">
                 {createMutation?.isPending ? (
                   <div className="flex items-center justify-center">
                     <Spinner className="text-white" size={20} />
