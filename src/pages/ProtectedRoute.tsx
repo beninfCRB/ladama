@@ -17,7 +17,7 @@ export function ProtectedRoute() {
       timer = window.setTimeout(() => {
         setLoggedIn(false);
         localStorage.removeItem("token");
-        navigate("/login");
+        navigate("/auth/login");
       }, timeOut);
     };
 
