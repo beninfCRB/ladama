@@ -56,6 +56,7 @@ const registerSchema = z.object({
   nomor_npwp_pic: z.string().min(1, "Nomor NPWP PIC tidak boleh kosong."),
   alamat_pic: z.string().min(1, "Alamat PIC tidak boleh kosong."),
   provinsi_pic: z.string().min(1, "Provinsi PIC tidak boleh kosong."),
+  kabupaten_pic: z.string().min(1, "Kabupaten PIC tidak boleh kosong."),
   kecamatan_pic: z.string().min(1, "Kecamatan PIC tidak boleh kosong."),
   kelurahan_pic: z.string().min(1, "Kelurahan PIC tidak boleh kosong."),
   tempat_lahir: z.string().min(1, "Tempat Lahir tidak boleh kosong."),

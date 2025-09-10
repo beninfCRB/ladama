@@ -16,8 +16,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-
-type FileTypeMode = "image" | "document";
+import type { FileType, FileTypeMode } from "@/types/upload";
 
 interface FileUploadFieldProps<T extends FieldValues> {
   name: Path<T>;
@@ -25,6 +24,9 @@ interface FileUploadFieldProps<T extends FieldValues> {
   label: string;
   mode: FileTypeMode;
   description?: string;
+
+  valueFile?: FileType | null;
+  onFileChange?: (file: FileList | null) => void;
 }
 
 function FileUploadField<T extends FieldValues>({
@@ -33,6 +35,8 @@ function FileUploadField<T extends FieldValues>({
   label,
   mode,
   description,
+  valueFile,
+  onFileChange,
 }: FileUploadFieldProps<T>) {
   const [fileName, setFileName] = useState<string | null>(null);
   const [fileUrl, setFileUrl] = useState<string | null>(null);
@@ -41,11 +45,18 @@ function FileUploadField<T extends FieldValues>({
 
   const inputRef = useRef<HTMLInputElement | null>(null);
 
-  // Tentukan accept berdasarkan mode
   const accept =
     mode === "image"
       ? "image/*"
       : ".pdf,.doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+
+  useEffect(() => {
+    if (valueFile) {
+      setFileName(valueFile.name);
+      setFileUrl(valueFile.url);
+      setFileType(valueFile.type);
+    }
+  }, [valueFile]);
 
   const handleFileChange = (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -53,13 +64,17 @@ function FileUploadField<T extends FieldValues>({
   ) => {
     const files = e.target.files;
     onChange(files);
+    if (onFileChange) onFileChange(files);
 
     if (files?.[0]) {
       if (fileUrl) URL.revokeObjectURL(fileUrl);
 
-      setFileName(files[0].name);
-      setFileType(files[0].type);
-      setFileUrl(URL.createObjectURL(files[0]));
+      const newFile = files[0];
+      const newUrl = URL.createObjectURL(newFile);
+
+      setFileName(newFile.name);
+      setFileType(newFile.type);
+      setFileUrl(newUrl);
     } else {
       resetFile(onChange);
     }
@@ -72,6 +87,7 @@ function FileUploadField<T extends FieldValues>({
     setFileUrl(null);
 
     if (onChange) onChange(null);
+    if (onFileChange) onFileChange(null);
     if (inputRef.current) inputRef.current.value = "";
   };
 

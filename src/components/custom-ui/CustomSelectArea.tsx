@@ -5,8 +5,12 @@ import {
   useProvinsi,
   type AreaStoreTypes,
 } from "@/stores/area.store";
-import { useEffect, useRef } from "react";
-import type { FieldValues, Path, UseFormReturn } from "react-hook-form";
+import { useEffect } from "react";
+import {
+  type FieldValues,
+  type UseFormReturn,
+  type Path,
+} from "react-hook-form";
 import { FormControl, FormField, FormItem, FormMessage } from "../ui/form";
 import CustomSelect from "./CustomSelect";
 import RequiredLabel from "./RequiredLabel";
@@ -14,10 +18,15 @@ import RequiredLabel from "./RequiredLabel";
 interface CustomSelectAreaProps<T extends FieldValues> {
   form: UseFormReturn<T>;
   required: boolean;
-  provinsiField: Path<T>;
-  kabupatenField: Path<T>;
-  kecamatanField: Path<T>;
-  kelurahanField: Path<T>;
+  provinsiField: Extract<keyof T, string>;
+  kabupatenField: Extract<keyof T, string>;
+  kecamatanField: Extract<keyof T, string>;
+  kelurahanField: Extract<keyof T, string>;
+}
+
+// 🔹 helper konversi aman
+function asPath<T extends FieldValues>(key: Extract<keyof T, string>): Path<T> {
+  return key as unknown as Path<T>;
 }
 
 function CustomSelectArea<T extends FieldValues>({
@@ -28,55 +37,42 @@ function CustomSelectArea<T extends FieldValues>({
   kecamatanField,
   kelurahanField,
 }: CustomSelectAreaProps<T>) {
-  const { watch, resetField } = form;
-  const provinsiId = watch(provinsiField);
-  const kotaId = watch(kabupatenField);
-  const kecamatanId = watch(kecamatanField);
+  const { resetField, watch } = form;
 
-  const prevProvinsiId = usePrevious(provinsiId);
-  const prevKotaId = usePrevious(kotaId);
-  const prevKecamatanId = usePrevious(kecamatanId);
+  const provinsiId = watch(asPath<T>(provinsiField));
+  const kotaId = watch(asPath<T>(kabupatenField));
+  const kecamatanId = watch(asPath<T>(kecamatanField));
 
   const { query: provinsi } = useProvinsi();
   const { query: kota } = useKota(provinsiId);
   const { query: kecamatan } = useKecamatan(kotaId);
   const { query: kelurahan } = useKelurahan(kecamatanId);
 
-  function usePrevious<U>(value: U): U | undefined {
-    const ref = useRef<U | undefined>(undefined);
-    useEffect(() => {
-      ref.current = value;
-    }, [value]);
-    return ref.current;
-  }
-
+  // reset otomatis saat field berubah
   useEffect(() => {
-    if (provinsiId && provinsiId !== prevProvinsiId) {
-      resetField(kabupatenField);
-      resetField(kecamatanField);
-      resetField(kelurahanField);
-    }
+    const subscription = form.watch((_, { name }) => {
+      if (name === asPath<T>(provinsiField)) {
+        resetField(asPath<T>(kabupatenField));
+        resetField(asPath<T>(kecamatanField));
+        resetField(asPath<T>(kelurahanField));
+      }
+      if (name === asPath<T>(kabupatenField)) {
+        resetField(asPath<T>(kecamatanField));
+        resetField(asPath<T>(kelurahanField));
+      }
+      if (name === asPath<T>(kecamatanField)) {
+        resetField(asPath<T>(kelurahanField));
+      }
+    });
+    return () => subscription.unsubscribe();
   }, [
-    provinsiId,
-    prevProvinsiId,
-    resetField,
+    form,
+    provinsiField,
     kabupatenField,
     kecamatanField,
     kelurahanField,
+    resetField,
   ]);
-
-  useEffect(() => {
-    if (kotaId && kotaId !== prevKotaId) {
-      resetField(kecamatanField);
-      resetField(kelurahanField);
-    }
-  }, [kotaId, prevKotaId, resetField, kecamatanField, kelurahanField]);
-
-  useEffect(() => {
-    if (kecamatanId && kecamatanId !== prevKecamatanId) {
-      resetField(kelurahanField);
-    }
-  }, [kecamatanId, prevKecamatanId, resetField, kelurahanField]);
 
   return (
     <>
@@ -84,7 +80,7 @@ function CustomSelectArea<T extends FieldValues>({
         <div className="space-y-2">
           <FormField
             control={form.control}
-            name={provinsiField}
+            name={asPath<T>(provinsiField)}
             render={({ field }) => (
               <FormItem>
                 <RequiredLabel required={required}>Provinsi</RequiredLabel>
@@ -105,7 +101,7 @@ function CustomSelectArea<T extends FieldValues>({
         <div className="space-y-2">
           <FormField
             control={form.control}
-            name={kabupatenField}
+            name={asPath<T>(kabupatenField)}
             render={({ field }) => (
               <FormItem>
                 <RequiredLabel required={required}>
@@ -132,7 +128,7 @@ function CustomSelectArea<T extends FieldValues>({
         <div className="space-y-2">
           <FormField
             control={form.control}
-            name={kecamatanField}
+            name={asPath<T>(kecamatanField)}
             render={({ field }) => (
               <FormItem>
                 <RequiredLabel required={required}>Kecamatan</RequiredLabel>
@@ -154,7 +150,7 @@ function CustomSelectArea<T extends FieldValues>({
         <div className="space-y-2">
           <FormField
             control={form.control}
-            name={kelurahanField}
+            name={asPath<T>(kelurahanField)}
             render={({ field }) => (
               <FormItem>
                 <RequiredLabel required={required}>Kelurahan</RequiredLabel>

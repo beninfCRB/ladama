@@ -14,15 +14,23 @@ interface GlobalState {
   setFormMode: (mode: "create" | "update" | null) => void;
 }
 
-const messageError = (res?: string | Array<string[]> | Array<string>) => {
-  if (res && typeof res !== "string") {
-    res.map((child) => {
-      if (typeof child !== "string") {
-        child.map((children) => toast.error(children));
+const messageError = (
+  res?: string | Array<string | string[]> | Record<string, string[]>
+) => {
+  if (typeof res === "string") {
+    toast.error(res);
+  } else if (Array.isArray(res)) {
+    res.forEach((item) => {
+      if (typeof item === "string") {
+        toast.error(item);
+      } else {
+        item.forEach((message) => toast.error(message));
       }
     });
-  } else if (res) {
-    toast.error(res);
+  } else if (res && typeof res === "object") {
+    Object.values(res).forEach((messages) => {
+      messages.forEach((message) => toast.error(message));
+    });
   }
 };
 

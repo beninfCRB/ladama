@@ -1,6 +1,7 @@
 import logo from "@/assets/logo.svg";
 import CustomSelect from "@/components/custom-ui/CustomSelect";
 import CustomSelectArea from "@/components/custom-ui/CustomSelectArea";
+import DatePicker from "@/components/custom-ui/DatePicker";
 import FileUploadField from "@/components/custom-ui/FileUploadField";
 import RequiredLabel from "@/components/custom-ui/RequiredLabel";
 import { InteractiveHoverButton } from "@/components/magicui/interactive-hover-button";
@@ -17,14 +18,15 @@ import {
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/shadcn-io/spinner";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
-import { convertToFormData } from "@/lib/convertToFormData";
-import { registerSchema, type registerFormType } from "@/schemas/auth.schema";
-import { useRegister } from "@/stores/auth.store";
+import { Textarea } from "@/components/ui/textarea";
+import { registerSchema } from "@/schemas/auth.schema";
+import { useKodeVerifikasi, useRegister } from "@/stores/auth.store";
 import {
   useJenisKelompok,
   type JenisKelompokStoreTypes,
 } from "@/stores/jenisKelompok.store";
 import type { JenisKelamin } from "@/types/static";
+import type { FileType } from "@/types/upload";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Check, CreditCard, FileText, Users } from "lucide-react";
 import { useState } from "react";
@@ -57,11 +59,15 @@ const navigationSteps = [
 
 function AuthRegister() {
   const { query: jenisKelompok } = useJenisKelompok();
-  const { createMutation } = useRegister();
+  const { createMutation: register } = useRegister();
+  const { createMutation: verificationCode } = useKodeVerifikasi();
   const [activeTab, setActiveTab] = useState("step1");
+  const [file, setFile] = useState<FileType | null>(null);
+  const [image, setImage] = useState<FileType | null>(null);
 
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
+    shouldUnregister: false,
     defaultValues: {
       jenis_kelompok_masyarakat_id: "",
       kelompok_masyarakat: "",
@@ -72,6 +78,7 @@ function AuthRegister() {
       nomor_npwp_pic: "",
       alamat_pic: "",
       provinsi_pic: "",
+      kabupaten_pic: "",
       kecamatan_pic: "",
       kelurahan_pic: "",
       tempat_lahir: "",
@@ -94,7 +101,9 @@ function AuthRegister() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof registerSchema>) {}
+  function onSubmit(values: z.infer<typeof registerSchema>) {
+    const formData = new FormData();
+  }
 
   const handleTabChange = async (value: string) => {
     if (activeTab === "step1") {
@@ -116,6 +125,7 @@ function AuthRegister() {
         "nomor_identitas_pic",
         "nomor_npwp_pic",
         "provinsi_pic",
+        "kabupaten_pic",
         "kecamatan_pic",
         "kelurahan_pic",
         "tempat_lahir",
@@ -129,23 +139,26 @@ function AuthRegister() {
         "kode_aktivasi",
       ]);
       if (isValid) {
-        const values = form.getValues();
-        const formData = convertToFormData<registerFormType>(values);
-
-        createMutation.mutate(formData, {
-          onSuccess: () => {
-            setActiveTab("step3");
-          },
-        });
+        // const values = form.getValues();
+        // const formData = convertToFormData<Partial<registerFormType>>(values);
+        // createMutation.mutate(formData, {
+        //   onSuccess: () => {
+        //     setActiveTab("step3");
+        //   },
+        // });
       }
     } else if (activeTab === "step3") {
       const isValid = await form.trigger(["foto_ktp"]);
       if (isValid) {
-        const values = form.getValues();
-        const formData = convertToFormData<registerFormType>(values);
-        createMutation.mutate(formData);
+        // const values = form.getValues();
+        // const formData = convertToFormData<Partial<registerFormType>>(values);
+        // createMutation.mutate(formData);
       }
     }
+  };
+
+  const kodeAktivasi = async () => {
+    await verificationCode.mutate({ email_pic: form.getValues("email_pic") });
   };
 
   const goBack = (value: string) => {
@@ -219,7 +232,7 @@ function AuthRegister() {
   return (
     <div className="min-h-screen flex flex-col lg:flex-row">
       {/* Left Section - Navigation Steps */}
-      <div className="w-full lg:w-1/3 bg-white p-4 lg:p-6 xl:p-8 border-r border-gray-200">
+      <div className="w-full lg:w-1/3 bg-white p-4 lg:p-6 xl:p-8 border-r border-gray-200 lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto">
         {/* Logo */}
         <div className="mb-8 lg:mb-12">
           <div className="flex items-center gap-2">
@@ -303,12 +316,12 @@ function AuthRegister() {
                   {activeTab === "step3" && "Unggah KTP"}
                 </CardTitle>
                 <div className="text-sm text-gray-500">
-                  LANGKAH{" "}
+                  LANGKAH
                   {activeTab === "step1"
                     ? "1"
                     : activeTab === "step2"
                     ? "2"
-                    : "3"}{" "}
+                    : "3"}
                   DARI 3
                 </div>
                 <TimelineProgress />
@@ -372,7 +385,7 @@ function AuthRegister() {
                         />
                       </div>
 
-                      <CustomSelectArea<registerFormType>
+                      <CustomSelectArea
                         form={form}
                         required
                         provinsiField="provinsi_kelompok_masyarakat_id"
@@ -384,9 +397,22 @@ function AuthRegister() {
                       <FileUploadField
                         name="profil_kelompok"
                         control={form.control}
-                        label="Unggah Dokumen Profil"
-                        mode="document"
+                        label="Unggah Dokumen Profil Kelompok"
                         description="(Format: PDF, DOC, DOCX, Max 10 MB)"
+                        mode="document"
+                        valueFile={file}
+                        onFileChange={(files) => {
+                          if (files?.[0]) {
+                            const f = files[0];
+                            setFile({
+                              name: f.name,
+                              url: URL.createObjectURL(f),
+                              type: f.type,
+                            });
+                          } else {
+                            setFile(null);
+                          }
+                        }}
                       />
 
                       <div className="flex items-center justify-center">
@@ -399,17 +425,6 @@ function AuthRegister() {
                       </div>
                     </form>
                   </Form>
-
-                  {/* Login Link */}
-                  <div className="text-center text-sm">
-                    <span className="text-gray-600">Sudah punya akun? </span>
-                    <a
-                      href="/auth/login"
-                      className="text-green-600 hover:underline font-medium"
-                    >
-                      Login
-                    </a>
-                  </div>
                 </CardContent>
               </TabsContent>
 
@@ -428,7 +443,7 @@ function AuthRegister() {
                           render={({ field }) => (
                             <FormItem>
                               <RequiredLabel required>
-                                Nama Lengkap{" "}
+                                Nama Lengkap
                               </RequiredLabel>
                               <FormControl className="h-10">
                                 <Input
@@ -510,7 +525,7 @@ function AuthRegister() {
                             render={({ field }) => (
                               <FormItem>
                                 <RequiredLabel required>
-                                  Tempat Lahir{" "}
+                                  Tempat Lahir
                                 </RequiredLabel>
                                 <FormControl className="h-10">
                                   <Input
@@ -530,10 +545,20 @@ function AuthRegister() {
                             render={({ field }) => (
                               <FormItem>
                                 <RequiredLabel required>
-                                  Tanggal Lahir{" "}
+                                  Tanggal Lahir
                                 </RequiredLabel>
                                 <FormControl className="h-10">
-                                  <Input type="date" {...field} />
+                                  <DatePicker
+                                    value={
+                                      field.value
+                                        ? new Date(field.value)
+                                        : undefined
+                                    }
+                                    onChange={(date) =>
+                                      field.onChange(date?.toISOString())
+                                    }
+                                    placeholder="Pilih tanggal lahir"
+                                  />
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -549,7 +574,7 @@ function AuthRegister() {
                           render={({ field }) => (
                             <FormItem>
                               <RequiredLabel required>
-                                Jenis Kelamin{" "}
+                                Jenis Kelamin
                               </RequiredLabel>
                               <FormControl className="h-10">
                                 <CustomSelect<JenisKelamin>
@@ -577,7 +602,7 @@ function AuthRegister() {
                             <FormItem>
                               <RequiredLabel required>Alamat</RequiredLabel>
                               <FormControl className="h-10">
-                                <Input
+                                <Textarea
                                   placeholder="Masukkan alamat lengkap"
                                   {...field}
                                 />
@@ -588,6 +613,15 @@ function AuthRegister() {
                         />
                       </div>
 
+                      <CustomSelectArea
+                        form={form}
+                        required
+                        provinsiField="provinsi_pic"
+                        kabupatenField="kabupaten_pic"
+                        kecamatanField="kecamatan_pic"
+                        kelurahanField="kelurahan_pic"
+                      />
+
                       <div className="space-y-2">
                         <FormField
                           name="nohp_pic"
@@ -595,7 +629,7 @@ function AuthRegister() {
                           render={({ field }) => (
                             <FormItem>
                               <RequiredLabel required>
-                                No. Telepon{" "}
+                                No. Telepon
                               </RequiredLabel>
                               <FormControl className="h-10">
                                 <Input
@@ -603,7 +637,6 @@ function AuthRegister() {
                                   placeholder="Masukkan nomor telepon"
                                   inputMode="numeric"
                                   pattern="[0-9]*"
-                                  maxLength={16}
                                   value={field.value || ""}
                                   onChange={(e) => {
                                     const numericValue = e.target.value.replace(
@@ -628,11 +661,11 @@ function AuthRegister() {
                             render={({ field }) => (
                               <FormItem>
                                 <RequiredLabel required>
-                                  Nama Kontak Darurat
+                                  Nama Kontak Draurat
                                 </RequiredLabel>
                                 <FormControl className="h-10">
                                   <Input
-                                    placeholder="Masukkan nama kontak darurat"
+                                    placeholder="Nama Kontak Darurat"
                                     {...field}
                                   />
                                 </FormControl>
@@ -656,7 +689,6 @@ function AuthRegister() {
                                     placeholder="Masukkan nomor kontak darurat"
                                     inputMode="numeric"
                                     pattern="[0-9]*"
-                                    maxLength={16}
                                     value={field.value || ""}
                                     onChange={(e) => {
                                       const numericValue =
@@ -692,66 +724,35 @@ function AuthRegister() {
                             )}
                           />
                         </div>
-                        <div className="space-y-2">
-                          <FormField
-                            name="kode_aktivasi"
-                            control={form.control}
-                            render={({ field }) => (
-                              <FormItem>
-                                <RequiredLabel required>
-                                  Kode Aktivasi
-                                </RequiredLabel>
-                                <div className="flex gap-2">
-                                  <FormControl className="h-10 flex-1">
-                                    <Input
-                                      placeholder="Masukkan kode aktivasi"
-                                      maxLength={6}
-                                      {...field}
-                                    />
-                                  </FormControl>
-                                  <ShinyButton
-                                    type="button"
-                                    className="h-10 px-4 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg font-semibold"
-                                    onClick={() => {
-                                      const kode =
-                                        form.getValues("kode_aktivasi");
-                                      if (!kode) {
-                                        form.setError("kode_aktivasi", {
-                                          message: "Kode aktivasi wajib diisi",
-                                        });
-                                        return;
-                                      }
-                                      // TODO: panggil API verifikasi kode aktivasi
-                                      console.log(
-                                        "Verifikasi kode aktivasi:",
-                                        kode
-                                      );
-                                    }}
-                                  >
-                                    Verifikasi
-                                  </ShinyButton>
-                                </div>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
+                        <ShinyButton
+                          type="button"
+                          className="h-10 px-4 lg:mt-7 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg font-semibold"
+                          onClick={kodeAktivasi}
+                        >
+                          Kirim Kode Verifikasi
+                        </ShinyButton>
                       </div>
 
-                      <div className="flex gap-4 mt-4">
-                        <Button
-                          variant="outline"
-                          className="w-1/2 bg-transparent h-10"
-                          onClick={() => handleTabChange("step1")}
-                        >
-                          Kembali
-                        </Button>
-                        <InteractiveHoverButton
-                          className="bg-green-600 hover:bg-green-700 text-white rounded-md h-10 w-1/2 flex items-center justify-center font-medium"
-                          onClick={() => goBack("step2")}
-                        >
-                          Berikutnya
-                        </InteractiveHoverButton>
+                      <div className="space-y-2">
+                        <FormField
+                          name="kode_aktivasi"
+                          control={form.control}
+                          render={({ field }) => (
+                            <FormItem>
+                              <RequiredLabel required>
+                                Kode Aktivasi
+                              </RequiredLabel>
+                              <FormControl className="h-10 flex-1">
+                                <Input
+                                  placeholder="Masukkan kode aktivasi"
+                                  maxLength={6}
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
                       </div>
                     </form>
                   </Form>
@@ -769,34 +770,77 @@ function AuthRegister() {
                       <FileUploadField
                         name="foto_ktp"
                         control={form.control}
-                        label="Unggah Foto Profil"
-                        mode="image"
+                        label="Unggah Dokumen Profil Kelompok"
                         description="(Format: JPG, PNG, GIF, Max 5 MB)"
+                        mode="image"
+                        valueFile={image}
+                        onFileChange={(files) => {
+                          if (files?.[0]) {
+                            const f = files[0];
+                            setImage({
+                              name: f.name,
+                              url: URL.createObjectURL(f),
+                              type: f.type,
+                            });
+                          } else {
+                            setImage(null);
+                          }
+                        }}
                       />
-
-                      <div className="flex gap-4 mt-4">
-                        <Button
-                          variant="outline"
-                          className="flex-1 bg-transparent h-10 w-1/2"
-                          onClick={() => goBack("step2")}
-                        >
-                          Kembali
-                        </Button>
-                        <ShinyButton className="h-10 bg-green-600 hover:bg-green-700 text-white rounded-lg text-2xl font-extrabold items-center justify-center flex w-1/2">
-                          {createMutation?.isPending ? (
-                            <div className="flex items-center justify-center">
-                              <Spinner className="text-white" size={20} />
-                            </div>
-                          ) : (
-                            "Daftar Sekarang"
-                          )}
-                        </ShinyButton>
-                      </div>
                     </form>
                   </Form>
                 </CardContent>
               </TabsContent>
             </Tabs>
+
+            {activeTab === "step1" && (
+              <div className="text-center text-sm">
+                <span className="text-gray-600">Sudah punya akun? </span>
+                <a
+                  href="/auth/login"
+                  className="text-green-600 hover:underline font-medium"
+                >
+                  Login
+                </a>
+              </div>
+            )}
+            {activeTab === "step2" && (
+              <div className="flex gap-4 mt-4 px-8">
+                <Button
+                  variant="outline"
+                  className="w-1/2 bg-transparent h-10"
+                  onClick={() => goBack("step1")}
+                >
+                  Kembali
+                </Button>
+                <InteractiveHoverButton
+                  className="bg-green-600 hover:bg-green-700 text-white rounded-md h-10 w-1/2 flex items-center justify-center font-medium"
+                  onClick={() => handleTabChange("step3")}
+                >
+                  Berikutnya
+                </InteractiveHoverButton>
+              </div>
+            )}
+            {activeTab === "step3" && (
+              <div className="flex gap-4 mt-4 px-8">
+                <Button
+                  variant="outline"
+                  className="flex-1 bg-transparent h-10 w-1/2"
+                  onClick={() => goBack("step2")}
+                >
+                  Kembali
+                </Button>
+                <ShinyButton className="h-10 bg-green-600 hover:bg-green-700 text-white rounded-lg text-2xl font-extrabold items-center justify-center flex w-1/2">
+                  {register?.isPending ? (
+                    <div className="flex items-center justify-center">
+                      <Spinner className="text-white" size={20} />
+                    </div>
+                  ) : (
+                    "Daftar Sekarang"
+                  )}
+                </ShinyButton>
+              </div>
+            )}
           </Card>
         </div>
       </div>

@@ -47,3 +47,13 @@ export const useRegister = createGlobalStore<RegisterFormType>(
   function () {},
   ["create"]
 );
+
+interface KodeVerifikasiType {
+  email_pic: string;
+}
+
+export const useKodeVerifikasi = createGlobalStore<KodeVerifikasiType>(
+  "getKodeAktivasi",
+  function () {},
+  ["create"]
+);
