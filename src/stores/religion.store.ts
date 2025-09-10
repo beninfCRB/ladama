@@ -5,8 +5,7 @@ export interface ReligionType {
   agama: string;
 }
 
-export const useReligion = createGlobalStore<Array<ReligionType>>(
+export const useReligion = createGlobalStore<Array<ReligionType>, "agama">(
   "agama",
-  function () {},
   ["read"]
 );

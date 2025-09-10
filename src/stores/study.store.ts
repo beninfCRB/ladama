@@ -5,8 +5,7 @@ export interface StudyType {
   pendidikan: string;
 }
 
-export const useStudy = createGlobalStore<Array<StudyType>>(
+export const useStudy = createGlobalStore<Array<StudyType>, "pendidikan">(
   "pendidikan",
-  function () {},
   ["read"]
 );

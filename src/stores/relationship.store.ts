@@ -5,8 +5,7 @@ export interface RelationshipType {
   status_pernikahan: string;
 }
 
-export const useRelationship = createGlobalStore<Array<RelationshipType>>(
-  "status-pernikahan",
-  function () {},
-  ["read"]
-);
+export const useRelationship = createGlobalStore<
+  Array<RelationshipType>,
+  "status-pernikahan"
+>("status-pernikahan", ["read"]);

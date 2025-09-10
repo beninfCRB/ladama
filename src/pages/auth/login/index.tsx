@@ -34,7 +34,9 @@ import { useForm } from "react-hook-form";
 
 function AuthLogin() {
   const [showPassword, setShowPassword] = useState(false);
-  const { query: banner } = useBanner();
+  const bannerData = useBanner().useGlobalStore(
+    (s) => s["banner-informasiData"]
+  );
   const { createMutation } = useLogin();
 
   const form = useForm<loginFormType>({
@@ -232,11 +234,11 @@ function AuthLogin() {
           </div>
           <CardContent className="p-4 bg-yellow-400 rounded-b-lg">
             <div className="container bg-white p-4 mt-[-2rem] rounded-lg text-wrap">
-              {banner?.data?.data?.deskripsi ? (
+              {bannerData?.data?.deskripsi ? (
                 <div
                   className="text-justify"
                   dangerouslySetInnerHTML={{
-                    __html: he.decode(banner.data?.data?.deskripsi),
+                    __html: he.decode(bannerData?.data?.deskripsi),
                   }}
                 />
               ) : (

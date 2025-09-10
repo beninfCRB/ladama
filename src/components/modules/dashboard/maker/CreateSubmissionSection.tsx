@@ -10,7 +10,7 @@ function CreateSubmissionSection() {
           BUAT PENGAJUAN
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex flex-col items-center justify-center py-8 space-y-4 flex-1">
+      <CardContent className="flex flex-col items-center justify-center md:py-0 lg:py-8 space-y-4 flex-1">
         <div className="w-16 h-16 border-2 border-dashed border-gray-300 rounded-full flex items-center justify-center">
           <Button
             variant="ghost"

@@ -5,13 +5,14 @@ import type { UserType } from "@/types/user";
 
 interface LoginTypes extends UserType, loginFormType {}
 
-export const useLogin = createGlobalStore<LoginTypes>("login", handleLogin, [
-  "create",
-]);
+export const useLogin = createGlobalStore<LoginTypes, "login">(
+  "login",
+  ["create"],
+  handleLogin
+);
 
-export const useRegister = createGlobalStore<FormData>(
+export const useRegister = createGlobalStore<FormData, "registerdua">(
   "registerdua",
-  function () {},
   ["create"]
 );
 
@@ -19,8 +20,7 @@ interface KodeVerifikasiType {
   email_pic: string;
 }
 
-export const useKodeVerifikasi = createGlobalStore<KodeVerifikasiType>(
-  "getKodeAktivasi",
-  function () {},
-  ["create"]
-);
+export const useKodeVerifikasi = createGlobalStore<
+  KodeVerifikasiType,
+  "getKodeAktivasi"
+>("getKodeAktivasi", ["create"]);

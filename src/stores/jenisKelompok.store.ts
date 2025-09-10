@@ -8,5 +8,6 @@ export interface JenisKelompokStoreTypes {
 }
 
 export const useJenisKelompok = createGlobalStore<
-  Array<JenisKelompokStoreTypes>
->("jenisKelompokMasyarakat", undefined, ["read"]);
+  Array<JenisKelompokStoreTypes>,
+  "jenisKelompokMasyarakat"
+>("jenisKelompokMasyarakat", ["read"]);

@@ -65,13 +65,17 @@ const navigationSteps = [
 ];
 
 function AuthRegister() {
-  const { query: jenisKelompok } = useJenisKelompok();
+  const jenisKelompok = useJenisKelompok().useGlobalStore(
+    (s) => s["jenisKelompokMasyarakatData"]
+  );
   const { createMutation: register } = useRegister();
   const { createMutation: verificationCode } = useKodeVerifikasi();
-  const { query: agama } = useReligion();
-  const { query: pernikahan } = useRelationship();
-  const { query: pekerjaan } = useJob();
-  const { query: pendidikan } = useStudy();
+  const agama = useReligion().useGlobalStore((s) => s["agamaData"]);
+  const pernikahan = useRelationship().useGlobalStore(
+    (s) => s["status-pernikahanData"]
+  );
+  const pekerjaan = useJob().useGlobalStore((s) => s["jenis-pekerjaanData"]);
+  const pendidikan = useStudy().useGlobalStore((s) => s["pendidikanData"]);
 
   const [activeTab, setActiveTab] = useState("step1");
   const [file, setFile] = useState<FileType | null>(null);
@@ -113,13 +117,8 @@ function AuthRegister() {
     },
   });
 
-  console.log(form.formState.errors);
-
   const onSubmit = async (values: registerFormType) => {
     const formData = convertToFormData(values);
-    formData.forEach((value, key) => {
-      console.log(key, value, typeof value);
-    });
 
     await register.mutate(formData);
   };
@@ -360,7 +359,7 @@ function AuthRegister() {
                               <FormControl>
                                 <CustomSelect<JenisKelompokStoreTypes>
                                   placeholder="Pilih jenis kelompok"
-                                  data={jenisKelompok.data?.data}
+                                  data={jenisKelompok?.data}
                                   fieldSetValue="id"
                                   fieldName="jenis_kelompok_masyarakat"
                                   {...field}
@@ -630,7 +629,7 @@ function AuthRegister() {
                                 <FormControl className="h-10">
                                   <CustomSelect<ReligionType>
                                     placeholder="Pilih agama"
-                                    data={agama?.data?.data}
+                                    data={agama?.data}
                                     fieldSetValue="id"
                                     fieldName="agama"
                                     {...field}
@@ -653,7 +652,7 @@ function AuthRegister() {
                                 <FormControl className="h-10">
                                   <CustomSelect<RelationshipType>
                                     placeholder="Pilih status pernikahan"
-                                    data={pernikahan?.data?.data}
+                                    data={pernikahan?.data}
                                     fieldSetValue="id"
                                     fieldName="status_pernikahan"
                                     {...field}
@@ -707,7 +706,7 @@ function AuthRegister() {
                                 <FormControl className="h-10">
                                   <CustomSelect<StudyType>
                                     placeholder="Pilih pendidikan"
-                                    data={pendidikan?.data?.data}
+                                    data={pendidikan?.data}
                                     fieldSetValue="id"
                                     fieldName="pendidikan"
                                     {...field}
@@ -730,7 +729,7 @@ function AuthRegister() {
                                 <FormControl className="h-10">
                                   <CustomSelect<JobType>
                                     placeholder="Pilih jenis pekerjaan"
-                                    data={pekerjaan?.data?.data}
+                                    data={pekerjaan?.data}
                                     fieldSetValue="id"
                                     fieldName="jenis_pekerjaan"
                                     {...field}

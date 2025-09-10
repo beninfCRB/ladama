@@ -8,7 +8,7 @@ function DraftSubmissionSection() {
           DRAFT PENGAJUAN
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex flex-col items-center justify-center py-8 space-y-4 flex-1">
+      <CardContent className="flex flex-col items-center justify-center md:py-0 lg:py-8 space-y-4 flex-1">
         <div className="text-center">
           <p className="text-sm text-gray-500">Tidak ada draft pengajuan</p>
         </div>

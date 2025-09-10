@@ -5,8 +5,7 @@ export interface JobType {
   jenis_pekerjaan: string;
 }
 
-export const useJob = createGlobalStore<Array<JobType>>(
+export const useJob = createGlobalStore<Array<JobType>, "jenis-pekerjaan">(
   "jenis-pekerjaan",
-  function () {},
   ["read"]
 );

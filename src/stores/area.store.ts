@@ -7,9 +7,8 @@ export interface AreaStoreTypes {
   meta?: string;
 }
 
-export const useProvinsi = createGlobalStore<Array<AreaStoreTypes>>(
+export const useProvinsi = createGlobalStore<Array<AreaStoreTypes>, "provinsi">(
   "provinsi",
-  undefined,
   ["read"]
 );
 
@@ -18,7 +17,7 @@ export interface KotaStoreTypes extends AreaStoreTypes {
 }
 
 export function useKota(id?: string) {
-  return createGlobalStore<KotaStoreTypes>(`provinsi`, undefined, ["read"])({
+  return createGlobalStore<KotaStoreTypes, "provinsi">(`provinsi`, ["read"])({
     id: id,
   });
 }
@@ -28,7 +27,7 @@ export interface KecamatanStoreTypes extends AreaStoreTypes {
 }
 
 export function useKecamatan(id?: string) {
-  return createGlobalStore<KecamatanStoreTypes>(`kota`, undefined, ["read"])({
+  return createGlobalStore<KecamatanStoreTypes, "kota">(`kota`, ["read"])({
     id: id,
   });
 }
@@ -38,7 +37,9 @@ export interface KelurahanStoreTypes extends AreaStoreTypes {
 }
 
 export function useKelurahan(id?: string) {
-  return createGlobalStore<KelurahanStoreTypes>(`kecamatan`, undefined, [
+  return createGlobalStore<KelurahanStoreTypes, "kecamatan">(`kecamatan`, [
     "read",
-  ])({ id: id });
+  ])({
+    id: id,
+  });
 }
