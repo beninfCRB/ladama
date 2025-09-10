@@ -21,7 +21,14 @@ import { useBanner } from "@/stores/banner.store";
 import { useLogin } from "@/stores/auth.store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import he from "he";
-import { ArrowLeft, Eye, EyeOff, Mail, MessageCircle } from "lucide-react";
+import {
+  ArrowLeft,
+  Eye,
+  EyeOff,
+  Lock,
+  Mail,
+  MessageCircle,
+} from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
@@ -83,9 +90,16 @@ function AuthLogin() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Email</FormLabel>
-                      <FormControl className="h-10">
-                        <Input placeholder="user@example.com" {...field} />
-                      </FormControl>
+                      <div className="relative">
+                        <Mail className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <FormControl>
+                          <Input
+                            placeholder="user@example.com"
+                            {...field}
+                            className="pl-8 h-10"
+                          />
+                        </FormControl>
+                      </div>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -98,13 +112,14 @@ function AuthLogin() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Password</FormLabel>
-                      <div className="h-10 relative">
+                      <div className="relative">
+                        <Lock className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                         <FormControl>
                           <Input
                             id="password"
                             type={showPassword ? "text" : "password"}
                             {...field}
-                            className="pr-10 h-10"
+                            className="pl-8 pr-10 h-10"
                             placeholder="example"
                           />
                         </FormControl>
@@ -121,8 +136,8 @@ function AuthLogin() {
                             <Eye className="h-4 w-4 text-gray-400" />
                           )}
                         </Button>
-                        <FormMessage />
                       </div>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
