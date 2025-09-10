@@ -6,7 +6,6 @@ import { useUserStore } from "@/stores/user.store";
 
 function HeaderGroup() {
   const user = useUserStore.getState().user;
-  console.log("🚀 ~ HeaderGroup ~ user:", user);
   return (
     <header className="bg-white border-b border-gray-200 px-4 py-3">
       <div className="container mx-auto flex items-center justify-between">

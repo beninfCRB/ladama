@@ -3,11 +3,13 @@ import ActivityHistory from "@/components/modules/dashboard/maker/ActivityHistor
 import CreateSubmissionSection from "@/components/modules/dashboard/maker/CreateSubmissionSection";
 import DraftSubmissionSection from "@/components/modules/dashboard/maker/DraftSubmissionSection";
 import ProgressSubmissionSection from "@/components/modules/dashboard/maker/ProgressSubmissionSection";
+import { useUserStore } from "@/stores/user.store";
 import moment from "moment";
 import { useEffect, useState } from "react";
 
 function DashboardPage() {
   const [date, setDate] = useState(moment());
+  const user = useUserStore.getState().user;
 
   useEffect(() => {
     const timer = setInterval(() => setDate(moment()), 1000);
@@ -21,7 +23,7 @@ function DashboardPage() {
           <span className="text-gray-600">🏠</span>
           <span className="text-gray-600">Halo,</span>
           <TypingAnimation className="font-semibold text-[#10a249] text-md">
-            KELOMPOK PENANAMAN MANGROVE
+            {user?.kelompok_masyarakat as string}
           </TypingAnimation>
         </div>
         <p className="text-sm font-medium text-yellow-500">
