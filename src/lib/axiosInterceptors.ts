@@ -16,6 +16,10 @@ useAxios.interceptors.request.use(
 
     if (token) config.headers.Authorization = `Bearer ${token}`;
 
+    if (config.data instanceof FormData) {
+      config.headers["Content-Type"] = "multipart/form-data";
+    }
+
     return config;
   },
   function (error) {
@@ -26,7 +30,7 @@ useAxios.interceptors.request.use(
       window.location.replace("/under-maintenance");
       return;
     } else if (!error.response || error.response.status === 401) {
-      window.location.replace("/login");
+      window.location.replace("/auth/login");
       return;
     }
 

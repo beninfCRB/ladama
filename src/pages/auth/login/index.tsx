@@ -16,9 +16,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/shadcn-io/spinner";
-import { loginSchema } from "@/schemas/auth.schema";
-import { useBanner } from "@/stores/banner.store";
+import { LoginSchema, type loginFormType } from "@/schemas/auth.schema";
 import { useLogin } from "@/stores/auth.store";
+import { useBanner } from "@/stores/banner.store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import he from "he";
 import {
@@ -31,22 +31,21 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import z from "zod";
 
 function AuthLogin() {
   const [showPassword, setShowPassword] = useState(false);
   const { query: banner } = useBanner();
   const { createMutation } = useLogin();
 
-  const form = useForm<z.infer<typeof loginSchema>>({
-    resolver: zodResolver(loginSchema),
+  const form = useForm<loginFormType>({
+    resolver: zodResolver(LoginSchema),
     defaultValues: {
       email_pic: "",
       password: "",
     },
   });
 
-  function onSubmit(values: z.infer<typeof loginSchema>) {
+  function onSubmit(values: loginFormType) {
     createMutation?.mutate(values);
   }
 
@@ -150,7 +149,11 @@ function AuthLogin() {
                   </Button>
                 </div>
               </div>
-              <ShinyButton className="w-full h-10 bg-green-600 hover:bg-green-700 text-white rounded-lg text-2xl font-extrabold items-center justify-center flex">
+              <ShinyButton
+                type="submit"
+                disabled={createMutation.isPending}
+                className="w-full h-10 bg-green-600 hover:bg-green-700 text-white rounded-lg text-2xl font-extrabold items-center justify-center flex"
+              >
                 {createMutation?.isPending ? (
                   <div className="flex items-center justify-center">
                     <Spinner className="text-white" size={20} />

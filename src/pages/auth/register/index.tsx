@@ -19,19 +19,26 @@ import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/shadcn-io/spinner";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { registerSchema } from "@/schemas/auth.schema";
+import { convertToFormData } from "@/lib/convertToFormData";
+import { RegisterSchema, type registerFormType } from "@/schemas/auth.schema";
 import { useKodeVerifikasi, useRegister } from "@/stores/auth.store";
 import {
   useJenisKelompok,
   type JenisKelompokStoreTypes,
 } from "@/stores/jenisKelompok.store";
+import { useJob, type JobType } from "@/stores/job.store";
+import {
+  useRelationship,
+  type RelationshipType,
+} from "@/stores/relationship.store";
+import { useReligion, type ReligionType } from "@/stores/religion.store";
+import { useStudy, type StudyType } from "@/stores/study.store";
 import type { JenisKelamin } from "@/types/static";
 import type { FileType } from "@/types/upload";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Check, CreditCard, FileText, Users } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import type z from "zod";
 
 const navigationSteps = [
   {
@@ -61,12 +68,17 @@ function AuthRegister() {
   const { query: jenisKelompok } = useJenisKelompok();
   const { createMutation: register } = useRegister();
   const { createMutation: verificationCode } = useKodeVerifikasi();
+  const { query: agama } = useReligion();
+  const { query: pernikahan } = useRelationship();
+  const { query: pekerjaan } = useJob();
+  const { query: pendidikan } = useStudy();
+
   const [activeTab, setActiveTab] = useState("step1");
   const [file, setFile] = useState<FileType | null>(null);
   const [image, setImage] = useState<FileType | null>(null);
 
-  const form = useForm<z.infer<typeof registerSchema>>({
-    resolver: zodResolver(registerSchema),
+  const form = useForm<registerFormType>({
+    resolver: zodResolver(RegisterSchema),
     shouldUnregister: false,
     defaultValues: {
       jenis_kelompok_masyarakat_id: "",
@@ -85,7 +97,7 @@ function AuthRegister() {
       tanggal_lahir: "",
       agama_id: "",
       status_perkawinan_id: "",
-      nama_gadis_ibu_kandung: "",
+      // nama_gadis_ibu_kandung: "",
       jenis_pekerjaan_id: "",
       nohp_pic: "",
       email_pic: "",
@@ -101,9 +113,16 @@ function AuthRegister() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof registerSchema>) {
-    const formData = new FormData();
-  }
+  console.log(form.formState.errors);
+
+  const onSubmit = async (values: registerFormType) => {
+    const formData = convertToFormData(values);
+    formData.forEach((value, key) => {
+      console.log(key, value, typeof value);
+    });
+
+    await register.mutate(formData);
+  };
 
   const handleTabChange = async (value: string) => {
     if (activeTab === "step1") {
@@ -137,23 +156,17 @@ function AuthRegister() {
         "nomor_kontak_darurat",
         "nama_kontak_darurat",
         "kode_aktivasi",
+        "agama_id",
+        "status_perkawinan_id",
+        "jenis_pekerjaan_id",
+        "pendidikan",
       ]);
+
       if (isValid) {
-        // const values = form.getValues();
-        // const formData = convertToFormData<Partial<registerFormType>>(values);
-        // createMutation.mutate(formData, {
-        //   onSuccess: () => {
-        //     setActiveTab("step3");
-        //   },
-        // });
+        setActiveTab(value);
       }
     } else if (activeTab === "step3") {
-      const isValid = await form.trigger(["foto_ktp"]);
-      if (isValid) {
-        // const values = form.getValues();
-        // const formData = convertToFormData<Partial<registerFormType>>(values);
-        // createMutation.mutate(formData);
-      }
+      await form.trigger(["foto_ktp"]);
     }
   };
 
@@ -423,6 +436,17 @@ function AuthRegister() {
                           Berikutnya
                         </InteractiveHoverButton>
                       </div>
+                      <div className="text-center text-sm">
+                        <span className="text-gray-600">
+                          Sudah punya akun?{" "}
+                        </span>
+                        <a
+                          href="/auth/login"
+                          className="text-green-600 hover:underline font-medium"
+                        >
+                          Login
+                        </a>
+                      </div>
                     </form>
                   </Form>
                 </CardContent>
@@ -470,6 +494,7 @@ function AuthRegister() {
                                   placeholder="Masukkan NIK"
                                   inputMode="numeric"
                                   pattern="[0-9]*"
+                                  minLength={16}
                                   maxLength={16}
                                   value={field.value || ""}
                                   onChange={(e) => {
@@ -594,6 +619,53 @@ function AuthRegister() {
                         />
                       </div>
 
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <FormField
+                            name="agama_id"
+                            control={form.control}
+                            render={({ field }) => (
+                              <FormItem>
+                                <RequiredLabel required>Agama</RequiredLabel>
+                                <FormControl className="h-10">
+                                  <CustomSelect<ReligionType>
+                                    placeholder="Pilih agama"
+                                    data={agama?.data?.data}
+                                    fieldSetValue="id"
+                                    fieldName="agama"
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <FormField
+                            name="status_perkawinan_id"
+                            control={form.control}
+                            render={({ field }) => (
+                              <FormItem>
+                                <RequiredLabel required>
+                                  Status Pernikahan
+                                </RequiredLabel>
+                                <FormControl className="h-10">
+                                  <CustomSelect<RelationshipType>
+                                    placeholder="Pilih status pernikahan"
+                                    data={pernikahan?.data?.data}
+                                    fieldSetValue="id"
+                                    fieldName="status_pernikahan"
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      </div>
+
                       <div className="space-y-2">
                         <FormField
                           name="alamat_pic"
@@ -622,6 +694,55 @@ function AuthRegister() {
                         kelurahanField="kelurahan_pic"
                       />
 
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <FormField
+                            name="pendidikan"
+                            control={form.control}
+                            render={({ field }) => (
+                              <FormItem>
+                                <RequiredLabel required>
+                                  Pendidikan
+                                </RequiredLabel>
+                                <FormControl className="h-10">
+                                  <CustomSelect<StudyType>
+                                    placeholder="Pilih pendidikan"
+                                    data={pendidikan?.data?.data}
+                                    fieldSetValue="id"
+                                    fieldName="pendidikan"
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <FormField
+                            name="jenis_pekerjaan_id"
+                            control={form.control}
+                            render={({ field }) => (
+                              <FormItem>
+                                <RequiredLabel required>
+                                  Jenis Pekerjaan
+                                </RequiredLabel>
+                                <FormControl className="h-10">
+                                  <CustomSelect<JobType>
+                                    placeholder="Pilih jenis pekerjaan"
+                                    data={pekerjaan?.data?.data}
+                                    fieldSetValue="id"
+                                    fieldName="jenis_pekerjaan"
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      </div>
+
                       <div className="space-y-2">
                         <FormField
                           name="nohp_pic"
@@ -631,22 +752,26 @@ function AuthRegister() {
                               <RequiredLabel required>
                                 No. Telepon
                               </RequiredLabel>
-                              <FormControl className="h-10">
-                                <Input
-                                  {...field}
-                                  placeholder="Masukkan nomor telepon"
-                                  inputMode="numeric"
-                                  pattern="[0-9]*"
-                                  value={field.value || ""}
-                                  onChange={(e) => {
-                                    const numericValue = e.target.value.replace(
-                                      /\D/g,
-                                      ""
-                                    );
-                                    field.onChange(numericValue);
-                                  }}
-                                />
-                              </FormControl>
+                              <div className="relative">
+                                <span className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 text-sm">
+                                  +62
+                                </span>
+                                <FormControl className="h-10">
+                                  <Input
+                                    {...field}
+                                    className="pl-10 h-10"
+                                    placeholder="Masukkan nomor telepon"
+                                    inputMode="numeric"
+                                    pattern="[0-9]*"
+                                    value={field.value || ""}
+                                    onChange={(e) => {
+                                      const numericValue =
+                                        e.target.value.replace(/\D/g, "");
+                                      field.onChange(numericValue);
+                                    }}
+                                  />
+                                </FormControl>
+                              </div>
                               <FormMessage />
                             </FormItem>
                           )}
@@ -683,20 +808,26 @@ function AuthRegister() {
                                 <RequiredLabel required>
                                   No. Kontak Darurat
                                 </RequiredLabel>
-                                <FormControl className="h-10">
-                                  <Input
-                                    {...field}
-                                    placeholder="Masukkan nomor kontak darurat"
-                                    inputMode="numeric"
-                                    pattern="[0-9]*"
-                                    value={field.value || ""}
-                                    onChange={(e) => {
-                                      const numericValue =
-                                        e.target.value.replace(/\D/g, "");
-                                      field.onChange(numericValue);
-                                    }}
-                                  />
-                                </FormControl>
+                                <div className="relative">
+                                  <span className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 text-sm">
+                                    +62
+                                  </span>
+                                  <FormControl className="h-10">
+                                    <Input
+                                      {...field}
+                                      className="pl-10 h-10"
+                                      placeholder="Masukkan nomor kontak darurat"
+                                      inputMode="numeric"
+                                      pattern="[0-9]*"
+                                      value={field.value || ""}
+                                      onChange={(e) => {
+                                        const numericValue =
+                                          e.target.value.replace(/\D/g, "");
+                                        field.onChange(numericValue);
+                                      }}
+                                    />
+                                  </FormControl>
+                                </div>
                                 <FormMessage />
                               </FormItem>
                             )}
@@ -745,7 +876,6 @@ function AuthRegister() {
                               <FormControl className="h-10 flex-1">
                                 <Input
                                   placeholder="Masukkan kode aktivasi"
-                                  maxLength={6}
                                   {...field}
                                 />
                               </FormControl>
@@ -753,6 +883,22 @@ function AuthRegister() {
                             </FormItem>
                           )}
                         />
+                      </div>
+
+                      <div className="flex gap-4 mt-4 px-8">
+                        <Button
+                          variant="outline"
+                          className="w-1/2 bg-transparent h-10"
+                          onClick={() => goBack("step1")}
+                        >
+                          Kembali
+                        </Button>
+                        <InteractiveHoverButton
+                          className="bg-green-600 hover:bg-green-700 text-white rounded-md h-10 w-1/2 flex items-center justify-center font-medium"
+                          onClick={() => handleTabChange("step3")}
+                        >
+                          Berikutnya
+                        </InteractiveHoverButton>
                       </div>
                     </form>
                   </Form>
@@ -787,60 +933,33 @@ function AuthRegister() {
                           }
                         }}
                       />
+                      <div className="flex gap-4 mt-4 px-8">
+                        <Button
+                          variant="outline"
+                          className="flex-1 bg-transparent h-10 w-1/2"
+                          onClick={() => goBack("step2")}
+                        >
+                          Kembali
+                        </Button>
+                        <ShinyButton
+                          type="submit"
+                          disabled={register?.isPending}
+                          className="h-10 bg-green-600 hover:bg-green-700 text-white rounded-lg text-2xl font-extrabold items-center justify-center flex w-1/2"
+                        >
+                          {register?.isPending ? (
+                            <div className="flex items-center justify-center">
+                              <Spinner className="text-white" size={20} />
+                            </div>
+                          ) : (
+                            "Daftar Sekarang"
+                          )}
+                        </ShinyButton>
+                      </div>
                     </form>
                   </Form>
                 </CardContent>
               </TabsContent>
             </Tabs>
-
-            {activeTab === "step1" && (
-              <div className="text-center text-sm">
-                <span className="text-gray-600">Sudah punya akun? </span>
-                <a
-                  href="/auth/login"
-                  className="text-green-600 hover:underline font-medium"
-                >
-                  Login
-                </a>
-              </div>
-            )}
-            {activeTab === "step2" && (
-              <div className="flex gap-4 mt-4 px-8">
-                <Button
-                  variant="outline"
-                  className="w-1/2 bg-transparent h-10"
-                  onClick={() => goBack("step1")}
-                >
-                  Kembali
-                </Button>
-                <InteractiveHoverButton
-                  className="bg-green-600 hover:bg-green-700 text-white rounded-md h-10 w-1/2 flex items-center justify-center font-medium"
-                  onClick={() => handleTabChange("step3")}
-                >
-                  Berikutnya
-                </InteractiveHoverButton>
-              </div>
-            )}
-            {activeTab === "step3" && (
-              <div className="flex gap-4 mt-4 px-8">
-                <Button
-                  variant="outline"
-                  className="flex-1 bg-transparent h-10 w-1/2"
-                  onClick={() => goBack("step2")}
-                >
-                  Kembali
-                </Button>
-                <ShinyButton className="h-10 bg-green-600 hover:bg-green-700 text-white rounded-lg text-2xl font-extrabold items-center justify-center flex w-1/2">
-                  {register?.isPending ? (
-                    <div className="flex items-center justify-center">
-                      <Spinner className="text-white" size={20} />
-                    </div>
-                  ) : (
-                    "Daftar Sekarang"
-                  )}
-                </ShinyButton>
-              </div>
-            )}
           </Card>
         </div>
       </div>

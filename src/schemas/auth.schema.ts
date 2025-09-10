@@ -1,7 +1,7 @@
 import type { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 
-const loginSchema = z.object({
+const LoginSchema = z.object({
   email_pic: z
     .string()
     .email("Email harus berupa alamat email yang valid.")
@@ -9,7 +9,9 @@ const loginSchema = z.object({
   password: z.string().min(1, "Password tidak boleh kosong."),
 });
 
-const registerSchema = z.object({
+type loginFormType = z.infer<typeof LoginSchema>;
+
+const RegisterSchema = z.object({
   jenis_kelompok_masyarakat_id: z
     .string()
     .min(1, "Jenis Kelompok Masyarakat tidak boleh kosong."),
@@ -17,36 +19,61 @@ const registerSchema = z.object({
     .string()
     .min(1, "Kelompok Masyarakat tidak boleh kosong."),
   profil_kelompok: z
-    .custom<FileList | null>((val) => val !== null && val instanceof FileList, {
-      message: "File tidak boleh kosong",
-    })
-    .refine((file) => file !== null && file?.[0], "File tidak boleh kosong")
+    .custom<FileList | File | null>(
+      (val) => val !== null && (val instanceof FileList || val instanceof File),
+      { message: "File tidak boleh kosong" }
+    )
+    .refine(
+      (file) => file !== null && (file instanceof File || file[0]),
+      "File tidak boleh kosong"
+    )
     .refine(
       (file) =>
         file !== null &&
-        [
-          "application/pdf",
-          "application/msword",
-          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        ].includes(file[0].type),
+        (file instanceof File
+          ? [
+              "application/pdf",
+              "application/msword",
+              "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            ].includes(file.type)
+          : [
+              "application/pdf",
+              "application/msword",
+              "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            ].includes(file[0].type)),
       "Tipe file harus .doc, .docx, atau .pdf"
     )
     .refine(
-      (file) => file !== null && file[0].size <= 10 * 1024 * 1024,
+      (file) =>
+        file !== null &&
+        (file instanceof File
+          ? file.size <= 10 * 1024 * 1024
+          : file[0].size <= 10 * 1024 * 1024),
       "Ukuran file maksimal 10MB"
     ),
   foto_ktp: z
-    .custom<FileList | null>((val) => val !== null && val instanceof FileList, {
-      message: "File tidak boleh kosong",
-    })
-    .refine((file) => file !== null && file?.[0], "File tidak boleh kosong")
-    .refine(
-      (file) =>
-        file !== null && ["image/jpg", "image/jpeg"].includes(file[0].type),
-      "Tipe file harus .doc, .docx, atau .pdf"
+    .custom<FileList | File | null>(
+      (val) => val !== null && (val instanceof FileList || val instanceof File),
+      { message: "File tidak boleh kosong" }
     )
     .refine(
-      (file) => file !== null && file[0].size <= 10 * 1024 * 1024,
+      (file) => file !== null && (file instanceof File || file[0]),
+      "File tidak boleh kosong"
+    )
+    .refine(
+      (file) =>
+        file !== null &&
+        (file instanceof File
+          ? ["image/jpg", "image/jpeg"].includes(file.type)
+          : ["image/jpg", "image/jpeg"].includes(file[0].type)),
+      "Tipe file harus .jpg atau .jpeg"
+    )
+    .refine(
+      (file) =>
+        file !== null &&
+        (file instanceof File
+          ? file.size <= 10 * 1024 * 1024
+          : file[0].size <= 10 * 1024 * 1024),
       "Ukuran file maksimal 10MB"
     ),
   nama_pic: z.string().min(1, "Nama PIC tidak boleh kosong."),
@@ -65,9 +92,9 @@ const registerSchema = z.object({
   status_perkawinan_id: z
     .string()
     .min(1, "Status Perkawinan tidak boleh kosong."),
-  nama_gadis_ibu_kandung: z
-    .string()
-    .min(1, "Nama Gadis Ibu Kandung tidak boleh kosong."),
+  // nama_gadis_ibu_kandung: z
+  //   .string()
+  //   .min(1, "Nama Gadis Ibu Kandung tidak boleh kosong."),
   jenis_pekerjaan_id: z.string().min(1, "Jenis Pekerjaan tidak boleh kosong."),
   nohp_pic: z.string().min(1, "Nomor HP PIC tidak boleh kosong."),
   email_pic: z.string().min(1, "Email PIC tidak boleh kosong."),
@@ -94,6 +121,13 @@ const registerSchema = z.object({
     .min(1, "Nomor Kontak Darurat tidak boleh kosong."),
 });
 
-type registerFormType = UseFormReturn<z.infer<typeof registerSchema>>;
+type registerFormType = z.infer<typeof RegisterSchema>;
+type registerFormReturnType = UseFormReturn<z.infer<typeof RegisterSchema>>;
 
-export { loginSchema, registerSchema, type registerFormType };
+export {
+  LoginSchema,
+  RegisterSchema,
+  type registerFormReturnType,
+  type registerFormType,
+  type loginFormType,
+};
