@@ -1,11 +1,13 @@
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import logo from "@/assets/logo.svg";
-import { handleLogout } from "@/handlers/auth/login.handler";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { useLogout } from "@/stores/auth.store";
 import { useUserStore } from "@/stores/user.store";
 
 function HeaderGroup() {
+  const { setDialog } = useLogout();
   const user = useUserStore.getState().user;
+
   return (
     <header className="bg-white border-b border-gray-200 px-4 py-3">
       <div className="container mx-auto flex items-center justify-between">
@@ -30,7 +32,7 @@ function HeaderGroup() {
               {user?.nama}
             </span>
           </div>
-          <Button variant="outline" size="sm" onClick={handleLogout}>
+          <Button variant="outline" size="sm" onClick={() => setDialog(true)}>
             Log Out
           </Button>
         </div>

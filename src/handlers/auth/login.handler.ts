@@ -3,7 +3,7 @@ import { useTokenStore, useUserStore } from "@/stores/user.store";
 import type { ResponseType } from "@/types/reponse";
 import type { UserType } from "@/types/user";
 
-async function handleLogin(res?: ResponseType<UserType>) {
+async function handlerLogin(res?: ResponseType<UserType>) {
   if (!res?.data) return;
 
   useTokenStore.getState().setToken(res?.data?.token || null);
@@ -20,10 +20,10 @@ async function handleLogin(res?: ResponseType<UserType>) {
   }
 }
 
-async function handleLogout() {
+async function handlerLogout() {
   useTokenStore.getState().clearToken();
   useUserStore.getState().clearUser();
   window.location.replace("/auth/login");
 }
 
-export { handleLogin, handleLogout };
+export { handlerLogin, handlerLogout };

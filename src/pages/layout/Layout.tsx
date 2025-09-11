@@ -1,3 +1,4 @@
+import DialogLogout from "@/components/modules/dashboard/DialogLogout";
 import HeaderGroup from "@/components/modules/dashboard/HeaderGroup";
 import MobileHeader from "@/components/modules/dashboard/MobileHeader";
 import SidebarNavigation from "@/components/modules/dashboard/SidebarNavigation";
@@ -15,7 +16,7 @@ export function Layout() {
       </div>
 
       {/* Main Content */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden pt-16 lg:pt-0">
         {/* Sidebar */}
         <div className="hidden lg:block h-full">
           <SidebarNavigation />
@@ -23,6 +24,7 @@ export function Layout() {
 
         {/* Outlet */}
         <div className="flex-1 h-full overflow-y-auto">
+          <DialogLogout />
           <Outlet />
         </div>
       </div>
