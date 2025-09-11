@@ -6,10 +6,17 @@ import { Menu } from "lucide-react";
 import { useState } from "react";
 import SidebarNavigation from "./SidebarNavigation";
 import { useLogout } from "@/stores/auth.store";
+import { useLocation } from "react-router";
 
 function MobileHeader() {
   const { setDialog } = useLogout();
   const [isOpen, setIsOpen] = useState(false);
+  const location = useLocation();
+  const pathSegments = location.pathname.split("/");
+  const capitalizedPath =
+    pathSegments.length > 2
+      ? pathSegments[2].charAt(0).toUpperCase() + pathSegments[2].slice(1)
+      : "";
 
   return (
     <div className="lg:hidden flex items-center p-4 bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-50 mb-4">
@@ -30,7 +37,7 @@ function MobileHeader() {
 
       <div className="flex items-center gap-2">
         <span className="text-gray-600">🏠</span>
-        <span className="font-semibold text-gray-800">Dashboard</span>
+        <span className="font-semibold text-gray-800">{capitalizedPath}</span>
       </div>
     </div>
   );

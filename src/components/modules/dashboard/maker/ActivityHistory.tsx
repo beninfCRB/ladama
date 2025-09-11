@@ -1,5 +1,6 @@
 "use client";
 
+import { MagicCard } from "@/components/magicui/magic-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -250,73 +251,79 @@ function ActivityHistory() {
               return (
                 <Card
                   key={activity.nomor_pengajuan}
-                  className="p-4 hover:bg-gray-50 transition-colors duration-150 cursor-pointer"
+                  className="p-0 hover:bg-gray-50 transition-colors duration-150 cursor-pointer shadow-none border-none"
                 >
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <p className="font-medium text-sm text-gray-800">
-                          {activity.jenis_kegiatan} {activity.jumlah}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {activity.nomor_pengajuan}
-                        </p>
-                      </div>
-                      <Badge
-                        variant="outline"
-                        className={`text-xs ${
-                          DictionaryColors[
-                            activity.tahapan_pengajuan as keyof typeof DictionaryColors
-                          ]
-                        }`}
-                      >
-                        {
-                          Dictionary[
-                            activity.tahapan_pengajuan as keyof typeof Dictionary
-                          ]
-                        }
-                      </Badge>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2 text-xs">
-                      <div>
-                        <span className="text-gray-500">Progress: </span>
-                        <span className="text-gray-800">
-                          {
-                            ProgressValue[
-                              activity.persentase_tahapan_pengajuan as keyof typeof ProgressValue
+                  <MagicCard
+                    className="p-4"
+                    gradientColor={"from-[#17a449] to-[#A3C537]"}
+                    gradientSize={250}
+                  >
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="font-medium text-sm text-gray-800">
+                            {activity.jenis_kegiatan} {activity.jumlah}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {activity.nomor_pengajuan}
+                          </p>
+                        </div>
+                        <Badge
+                          variant="outline"
+                          className={`text-xs ${
+                            DictionaryColors[
+                              activity.tahapan_pengajuan as keyof typeof DictionaryColors
                             ]
-                          }{" "}
-                          %
-                        </span>
+                          }`}
+                        >
+                          {
+                            Dictionary[
+                              activity.tahapan_pengajuan as keyof typeof Dictionary
+                            ]
+                          }
+                        </Badge>
                       </div>
-                      <div>
-                        <span className="text-gray-500">Budget: </span>
-                        <span className="text-gray-800">
-                          {formatRupiah(activity.dana_yang_diajukan)}
-                        </span>
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div>
+                          <span className="text-gray-500">Progress: </span>
+                          <span className="text-gray-800">
+                            {
+                              ProgressValue[
+                                activity.persentase_tahapan_pengajuan as keyof typeof ProgressValue
+                              ]
+                            }{" "}
+                            %
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-gray-500">Budget: </span>
+                          <span className="text-gray-800">
+                            {formatRupiah(activity.dana_yang_diajukan)}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-gray-500">Tanggal: </span>
+                          <span className="text-gray-800">
+                            {activity.tanggal_kegiatan}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-gray-500">Durasi: </span>
+                          <span className="text-gray-800">
+                            {activity.nomor_pengajuan}
+                          </span>
+                        </div>
                       </div>
-                      <div>
-                        <span className="text-gray-500">Tanggal: </span>
-                        <span className="text-gray-800">
-                          {activity.tanggal_kegiatan}
-                        </span>
-                      </div>
-                      <div>
-                        <span className="text-gray-500">Durasi: </span>
-                        <span className="text-gray-800">
-                          {activity.nomor_pengajuan}
-                        </span>
+                      <div className="pt-2">
+                        <Button
+                          variant="link"
+                          className="text-green-600 hover:text-green-700 p-0 h-auto text-xs"
+                        >
+                          Lihat Detail
+                        </Button>
                       </div>
                     </div>
-                    <div className="pt-2">
-                      <Button
-                        variant="link"
-                        className="text-green-600 hover:text-green-700 p-0 h-auto text-xs"
-                      >
-                        Lihat Detail
-                      </Button>
-                    </div>
-                  </div>
+                  </MagicCard>
                 </Card>
               );
             })}

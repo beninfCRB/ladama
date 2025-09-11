@@ -25,6 +25,16 @@ function DocumentGrid() {
     (s) => s["getJenisDokumenData"]
   );
 
+  const handleDownload = (filePath?: string) => {
+    const fileUrl = `${String(import.meta.env.VITE_PUBLIC_BASE_URL).replace(
+      "/api",
+      ""
+    )}/storage/${filePath}`;
+
+    const newWindow = window.open(fileUrl, "_blank", "noopener,noreferrer");
+    if (newWindow) newWindow.opener = null;
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {documents?.data
@@ -46,6 +56,7 @@ function DocumentGrid() {
                 variant="ghost"
                 size="sm"
                 className="flex-shrink-0 text-gray-400 hover:text-gray-600"
+                onClick={() => handleDownload(doc.dokumen?.file_path)}
               >
                 <Download className="w-4 h-4" />
               </Button>

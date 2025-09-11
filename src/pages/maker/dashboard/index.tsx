@@ -1,35 +1,13 @@
-import { TypingAnimation } from "@/components/magicui/typing-animation";
+import BreadCrumb from "@/components/custom-ui/BreadCrumb";
 import ActivityHistory from "@/components/modules/dashboard/maker/ActivityHistory";
 import CreateSubmissionSection from "@/components/modules/dashboard/maker/CreateSubmissionSection";
 import DraftSubmissionSection from "@/components/modules/dashboard/maker/DraftSubmissionSection";
 import ProgressSubmissionSection from "@/components/modules/dashboard/maker/ProgressSubmissionSection";
-import { useUserStore } from "@/stores/user.store";
-import moment from "moment";
-import { useEffect, useState } from "react";
 
 function DashboardMakerPage() {
-  const [date, setDate] = useState(moment());
-  const user = useUserStore.getState().user;
-
-  useEffect(() => {
-    const timer = setInterval(() => setDate(moment()), 1000);
-    return () => clearInterval(timer);
-  }, []);
-
   return (
     <main className="flex-1 px-3 sm:px-4 lg:px-6 py-3 sm:py-4 lg:py-6 space-y-3 sm:space-y-4 lg:space-y-6">
-      <div className="hidden lg:block space-y-2">
-        <div className="flex items-center gap-2">
-          <span className="text-gray-600">🏠</span>
-          <span className="text-gray-600">Halo,</span>
-          <TypingAnimation className="font-semibold text-[#10a249] text-md">
-            {user?.kelompok_masyarakat as string}
-          </TypingAnimation>
-        </div>
-        <p className="text-sm font-medium text-yellow-500">
-          {date.format("DD MMMM YYYY, HH:mm:ss")}
-        </p>
-      </div>
+      <BreadCrumb />
 
       <div className="space-y-3 sm:space-y-4 lg:space-y-0">
         <div className="lg:hidden">
