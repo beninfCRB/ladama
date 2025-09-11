@@ -8,7 +8,8 @@ export interface RiwayatPengajuanType {
   jenis_kegiatan: string;
   jumlah: string;
   lokasi: string;
-  tahapan_pengajuan: string;
+  tahapan_pengajuan: number;
+  persentase_tahapan_pengajuan: number;
   persentase_pengajuan: number | null;
   dana_yang_disetujui: number;
   dana_yang_diajukan: number;
@@ -21,3 +22,13 @@ export const useRiwayatPengajuan = createGlobalStore<
   Array<RiwayatPengajuanType>,
   "getDataRiwayatPengajuan"
 >("getDataRiwayatPengajuan", ["read"]);
+
+export const updatePersentaseTahapanPengajuan = (
+  data: RiwayatPengajuanType[]
+): RiwayatPengajuanType[] => {
+  return data.map((item) => ({
+    ...item,
+    tahapan_pengajuan: Number(item.tahapan_pengajuan) ?? 0,
+    persentase_tahapan_pengajuan: Number(item.tahapan_pengajuan) ?? 0,
+  }));
+};

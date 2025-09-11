@@ -120,7 +120,7 @@ function AuthRegister() {
   const onSubmit = async (values: registerFormType) => {
     const formData = convertToFormData(values);
 
-    await register.mutate(formData);
+    await register?.mutate(formData);
   };
 
   const handleTabChange = async (value: string) => {
@@ -170,7 +170,7 @@ function AuthRegister() {
   };
 
   const kodeAktivasi = async () => {
-    await verificationCode.mutate({ email_pic: form.getValues("email_pic") });
+    await verificationCode?.mutate({ email_pic: form.getValues("email_pic") });
   };
 
   const goBack = (value: string) => {

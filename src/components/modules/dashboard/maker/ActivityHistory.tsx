@@ -22,55 +22,13 @@ import {
 } from "@tanstack/react-table";
 import { useState } from "react";
 import {
+  updatePersentaseTahapanPengajuan,
   useRiwayatPengajuan,
   type RiwayatPengajuanType,
-} from "@/stores/riwayatPengajuan";
+} from "@/stores/riwayatPengajuan.store";
 import { formatRupiah } from "@/lib/rupiah";
 import moment from "moment";
-
-// interface Activity {
-//   id: string;
-//   activity: string;
-//   progress: string;
-//   status: string;
-//   fundsReceived: string;
-//   budget: string;
-//   date: string;
-//   duration: string;
-// }
-
-// const activities: Activity[] = [
-//   {
-//     id: "07113-2508-00111",
-//     activity: "Pelatihan 50 Orang",
-//     progress: "10 %",
-//     status: "Dalam Proses Verifikasi",
-//     fundsReceived: "0",
-//     budget: "0",
-//     date: "2025-09-28",
-//     duration: "1 Hari",
-//   },
-//   {
-//     id: "07313-2508-00109",
-//     activity: "Sosialisasi 50 Orang",
-//     progress: "0 %",
-//     status: "Selesai Ditolak",
-//     fundsReceived: "0",
-//     budget: "28.100.000",
-//     date: "2025-09-28",
-//     duration: "1 Hari",
-//   },
-//   {
-//     id: "07313-2508-00107",
-//     activity: "Penanaman Pohon 1 Hectare",
-//     progress: "0 %",
-//     status: "Selesai Ditolak",
-//     fundsReceived: "0",
-//     budget: "7.736.000",
-//     date: "2025-09-27",
-//     duration: "1 Hari",
-//   },
-// ];
+import { Dictionary, DictionaryColors, ProgressValue } from "@/lib/progress";
 
 const columns: ColumnDef<RiwayatPengajuanType>[] = [
   {
@@ -92,29 +50,30 @@ const columns: ColumnDef<RiwayatPengajuanType>[] = [
     ),
   },
   {
-    accessorKey: "persentase_pengajuan",
+    accessorKey: "tahapan_pengajuan",
     header: "Progress",
-    cell: ({ row }) => (
-      <div className="text-gray-800 text-xs sm:text-sm">
-        {row.getValue("persentase_pengajuan")}
-      </div>
-    ),
+    cell: ({ row }) => {
+      const progress = row.getValue("tahapan_pengajuan") as number;
+      return (
+        <div className="text-gray-800 text-xs sm:text-sm">
+          {ProgressValue[progress as keyof typeof ProgressValue]} %
+        </div>
+      );
+    },
   },
   {
-    accessorKey: "tahapan_pengajuan",
+    accessorKey: "persentase_tahapan_pengajuan",
     header: "Status",
     cell: ({ row }) => {
-      const status = row.getValue("tahapan_pengajuan") as string;
+      const status = row.getValue("persentase_tahapan_pengajuan") as number;
       return (
         <Badge
           variant="outline"
           className={`text-xs ${
-            status === "Dalam Proses Verifikasi"
-              ? "border-orange-300 text-orange-600 bg-orange-50"
-              : "border-red-300 text-red-600 bg-red-50"
+            DictionaryColors[status as keyof typeof DictionaryColors]
           }`}
         >
-          {status}
+          {Dictionary[status as keyof typeof Dictionary]}
         </Badge>
       );
     },
@@ -173,10 +132,13 @@ function ActivityHistory() {
   const activities = useRiwayatPengajuan().useGlobalStore(
     (s) => s["getDataRiwayatPengajuanData"]
   );
+  const transformedData = activities?.data
+    ? updatePersentaseTahapanPengajuan(activities.data)
+    : [];
   const [globalFilter, setGlobalFilter] = useState("");
 
   const table = useReactTable({
-    data: activities?.data || [],
+    data: transformedData,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
@@ -299,20 +261,28 @@ function ActivityHistory() {
                       <Badge
                         variant="outline"
                         className={`text-xs ${
-                          activity.tahapan_pengajuan ===
-                          "Dalam Proses Verifikasi"
-                            ? "border-orange-300 text-orange-600 bg-orange-50"
-                            : "border-red-300 text-red-600 bg-red-50"
+                          DictionaryColors[
+                            activity.tahapan_pengajuan as keyof typeof DictionaryColors
+                          ]
                         }`}
                       >
-                        {activity.tahapan_pengajuan}
+                        {
+                          Dictionary[
+                            activity.tahapan_pengajuan as keyof typeof Dictionary
+                          ]
+                        }
                       </Badge>
                     </div>
                     <div className="grid grid-cols-2 gap-2 text-xs">
                       <div>
                         <span className="text-gray-500">Progress: </span>
                         <span className="text-gray-800">
-                          {activity.persentase_pengajuan}
+                          {
+                            ProgressValue[
+                              activity.persentase_tahapan_pengajuan as keyof typeof ProgressValue
+                            ]
+                          }{" "}
+                          %
                         </span>
                       </div>
                       <div>

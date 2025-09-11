@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Spinner } from "@/components/ui/shadcn-io/spinner";
 import { formatRupiah } from "@/lib/rupiah";
-import { useProgressKegiatan } from "@/stores/progressKegiatan";
+import { useProgressKegiatan } from "@/stores/progressKegiatan.store";
 
 function ProgressSubmissionSection() {
   const progress = useProgressKegiatan().useGlobalStore(

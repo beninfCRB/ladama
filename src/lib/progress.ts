@@ -1,0 +1,47 @@
+export const ProgressValue = {
+  0: 5,
+  1: 10,
+  2: 15,
+  3: 25,
+  11: 35,
+  4: 45,
+  5: 55,
+  6: 65,
+  7: 75,
+  8: 85,
+  9: 95,
+  10: 100,
+  20: 0,
+};
+
+export const Dictionary = {
+  0: "Draft",
+  1: "Dalam Proses Verifikasi",
+  2: "Dalam Proses Validasi",
+  3: "Dalam Proses Unggah SPTJM",
+  11: "Dalam Proses Verifikasi SPTJM",
+  4: "Dalam Proses Pencairan Dana Termin 1",
+  5: "Dalam Proses Laporan Termin 1",
+  6: "Dalam Proses Verifikasi Laporan Termin 1",
+  7: "Dalam Proses Pencairan Dana Termin 2",
+  8: "Dalam Proses Unggah Laporan Akhir",
+  9: "Dalam Proses Verifikasi Laporan Akhir",
+  10: "Selesai Diterima",
+  20: "Selesai Ditolak",
+};
+
+export const DictionaryColors = {
+  0: "border-red-300 text-red-600 bg-red-50",
+  1: "border-orange-300 text-orange-600 bg-orange-50",
+  2: "border-yellow-300 text-yellow-600 bg-yellow-50",
+  3: "border-green-300 text-green-600 bg-green-50",
+  11: "border-teal-300 text-teal-600 bg-teal-50",
+  4: "border-blue-300 text-blue-600 bg-blue-50",
+  5: "border-indigo-300 text-indigo-600 bg-indigo-50",
+  6: "border-purple-300 text-purple-600 bg-purple-50",
+  7: "border-pink-300 text-pink-600 bg-pink-50",
+  8: "border-gray-300 text-gray-600 bg-gray-50",
+  9: "border-lime-300 text-lime-600 bg-lime-50",
+  10: "border-emerald-300 text-emerald-600 bg-emerald-50",
+  20: "border-rose-300 text-rose-600 bg-rose-50",
+};
