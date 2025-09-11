@@ -1,3 +1,4 @@
+import { useTokenStore } from "@/stores/user.store";
 import axios from "axios";
 import { toast } from "react-toastify";
 
@@ -12,7 +13,7 @@ const useAxios = axios.create({
 
 useAxios.interceptors.request.use(
   function (config) {
-    const token = localStorage.getItem("token")?.replace(/"/g, "");
+    const token = useTokenStore.getState().token;
 
     if (token) config.headers.Authorization = `Bearer ${token}`;
 

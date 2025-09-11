@@ -1,12 +1,15 @@
 import { ShinyButton } from "@/components/magicui/shiny-button";
 import { TypingAnimation } from "@/components/magicui/typing-animation";
-import { useTokenStore } from "@/stores/user.store";
+import { useTokenStore, useUserStore } from "@/stores/user.store";
 import { useEffect } from "react";
 import { Outlet, useNavigate } from "react-router";
 
 export function ProtectedRoute() {
   const navigate = useNavigate();
   const token = useTokenStore.getState().token;
+  const user = useUserStore.getState().user;
+  const clearToken = useTokenStore.getState().clearToken;
+  const clearUser = useUserStore.getState().clearUser;
 
   useEffect(() => {
     const timeOut = 3600000;
@@ -14,7 +17,8 @@ export function ProtectedRoute() {
     const resetTimer = () => {
       clearTimeout(timer);
       timer = window.setTimeout(() => {
-        localStorage.removeItem("token");
+        clearToken();
+        clearUser();
         navigate("/auth/login");
       }, timeOut);
     };
@@ -33,9 +37,9 @@ export function ProtectedRoute() {
       events.forEach((e) => window.removeEventListener(e, resetTimer, true));
       clearTimeout(timer);
     };
-  }, [navigate]);
+  }, [navigate, clearToken, clearUser]);
 
-  if (!token) {
+  if (!token && !user) {
     return (
       <h2 className="flex flex-col justify-center items-center h-screen gap-8 p-4 lg:p-0 text-center">
         <TypingAnimation className="text-4xl text-gray-500 text-wrap">

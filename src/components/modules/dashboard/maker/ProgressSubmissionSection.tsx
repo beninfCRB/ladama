@@ -13,7 +13,7 @@ function ProgressSubmissionSection() {
 
   return (
     <div className="relative rounded-xl overflow-hidden shadow-lg">
-      <Card className="relative rounded-xl">
+      <Card className="h-full relative rounded-xl">
         <CardHeader>
           <CardTitle className="text-gray-600 font-medium">
             PROGRESS KEGIATAN

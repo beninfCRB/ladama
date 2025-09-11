@@ -1,7 +1,13 @@
 "use client";
 
 import { create } from "zustand";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  type UseMutationResult,
+  type UseQueryResult,
+} from "@tanstack/react-query";
 import type { AxiosError } from "axios";
 import { toast } from "react-toastify";
 import { useAxios } from "./axiosInterceptors";
@@ -58,13 +64,10 @@ export function createGlobalStore<T, TResource extends string>(
       setFormMode: (mode) => set({ formMode: mode } as Partial<StoreType>),
     };
 
-    // tambahkan alias dynamic dengan cast aman
-    const initialState = {
+    return {
       ...baseState,
       [alias]: null,
-    } as unknown as StoreType;
-
-    return initialState;
+    } as StoreType;
   });
 
   const useCrud = (options?: {
@@ -74,107 +77,113 @@ export function createGlobalStore<T, TResource extends string>(
     const queryClient = useQueryClient();
 
     // READ
-    const query = allowedMethods.includes("read")
-      ? useQuery<ResponseType<T>>({
-          queryKey: [resource, options?.id, options?.params],
-          queryFn: async () => {
-            const url = options?.id
-              ? `${import.meta.env.VITE_PUBLIC_BASE_URL}/${resource}/${
-                  options.id
-                }`
-              : `${import.meta.env.VITE_PUBLIC_BASE_URL}/${resource}`;
+    const query: UseQueryResult<ResponseType<T>> = useQuery({
+      queryKey: [resource, options?.id, options?.params],
+      queryFn: async () => {
+        const url = options?.id
+          ? `${import.meta.env.VITE_PUBLIC_BASE_URL}/${resource}/${options.id}`
+          : `${import.meta.env.VITE_PUBLIC_BASE_URL}/${resource}`;
 
-            const { data } = await useAxios.get<ResponseType<T>>(url, {
-              params: options?.params,
-            });
+        const { data } = await useAxios.get<ResponseType<T>>(url, {
+          params: options?.params,
+        });
 
-            useGlobalStore.setState({ [alias]: data } as unknown as StoreType);
-            callback?.(data);
-            return data;
-          },
-        })
-      : (null as any);
+        useGlobalStore.setState({ [alias]: data } as unknown as StoreType);
+        callback?.(data);
+        return data;
+      },
+      enabled: allowedMethods.includes("read"),
+    });
 
     // CREATE
-    const createMutation = allowedMethods.includes("create")
-      ? useMutation<ResponseType<T>, unknown, Partial<T>>({
-          mutationFn: async (payload) => {
-            const { data } = await useAxios.post<ResponseType<T>>(
-              `${import.meta.env.VITE_PUBLIC_BASE_URL}/${resource}`,
-              payload
-            );
-            return data;
-          },
-          onSuccess: (data) => {
-            queryClient.invalidateQueries({ queryKey: [resource] });
-            useGlobalStore.setState({ [alias]: data } as unknown as StoreType);
-            callback?.(data);
-          },
-          onError: (error: unknown) => {
-            const axiosError = error as AxiosError<{
-              message: string | string[];
-            }>;
-            messageError(axiosError.response?.data?.message);
-          },
-        })
-      : (null as any);
+    const createMutation: UseMutationResult<
+      ResponseType<T>,
+      AxiosError<{ message: string | string[] }>,
+      Partial<T>
+    > = useMutation({
+      mutationFn: async (payload) => {
+        if (!allowedMethods.includes("create")) {
+          throw new Error("Method not allowed");
+        }
+        const { data } = await useAxios.post<ResponseType<T>>(
+          `${import.meta.env.VITE_PUBLIC_BASE_URL}/${resource}`,
+          payload
+        );
+        return data;
+      },
+      onSuccess: (data) => {
+        queryClient.invalidateQueries({ queryKey: [resource] });
+        useGlobalStore.setState({ [alias]: data } as unknown as StoreType);
+        callback?.(data);
+      },
+      onError: (error) => {
+        messageError(error.response?.data?.message);
+      },
+    });
 
     // UPDATE
-    const updateMutation = allowedMethods.includes("update")
-      ? useMutation<
-          ResponseType<T>,
-          unknown,
-          { id: string | number; payload: Partial<T> }
-        >({
-          mutationFn: async ({ id, payload }) => {
-            const { data } = await useAxios.put<ResponseType<T>>(
-              `${import.meta.env.VITE_PUBLIC_BASE_URL}/${resource}/${id}`,
-              payload
-            );
-            return data;
-          },
-          onSuccess: (data) => {
-            queryClient.invalidateQueries({ queryKey: [resource] });
-            useGlobalStore.setState({ [alias]: data } as unknown as StoreType);
-            callback?.(data);
-          },
-          onError: (error: unknown) => {
-            const axiosError = error as AxiosError<{
-              message: string | string[];
-            }>;
-            messageError(axiosError.response?.data?.message);
-          },
-        })
-      : (null as any);
+    const updateMutation: UseMutationResult<
+      ResponseType<T>,
+      AxiosError<{ message: string | string[] }>,
+      { id: string | number; payload: Partial<T> }
+    > = useMutation({
+      mutationFn: async ({ id, payload }) => {
+        if (!allowedMethods.includes("update")) {
+          throw new Error("Method not allowed");
+        }
+        const { data } = await useAxios.put<ResponseType<T>>(
+          `${import.meta.env.VITE_PUBLIC_BASE_URL}/${resource}/${id}`,
+          payload
+        );
+        return data;
+      },
+      onSuccess: (data) => {
+        queryClient.invalidateQueries({ queryKey: [resource] });
+        useGlobalStore.setState({ [alias]: data } as unknown as StoreType);
+        callback?.(data);
+      },
+      onError: (error) => {
+        messageError(error.response?.data?.message);
+      },
+    });
 
     // DELETE
-    const deleteMutation = allowedMethods.includes("delete")
-      ? useMutation<ResponseType<T>, unknown, string | number>({
-          mutationFn: async (id) => {
-            const { data } = await useAxios.delete<ResponseType<T>>(
-              `${import.meta.env.VITE_PUBLIC_BASE_URL}/${resource}/${id}`
-            );
-            return data;
-          },
-          onSuccess: (data) => {
-            queryClient.invalidateQueries({ queryKey: [resource] });
-            useGlobalStore.setState({ [alias]: data } as unknown as StoreType);
-            callback?.(data);
-          },
-          onError: (error: unknown) => {
-            const axiosError = error as AxiosError<{
-              message: string | string[];
-            }>;
-            messageError(axiosError.response?.data?.message);
-          },
-        })
-      : (null as any);
+    const deleteMutation: UseMutationResult<
+      ResponseType<T>,
+      AxiosError<{ message: string | string[] }>,
+      string | number
+    > = useMutation({
+      mutationFn: async (id) => {
+        if (!allowedMethods.includes("delete")) {
+          throw new Error("Method not allowed");
+        }
+        const { data } = await useAxios.delete<ResponseType<T>>(
+          `${import.meta.env.VITE_PUBLIC_BASE_URL}/${resource}/${id}`
+        );
+        return data;
+      },
+      onSuccess: (data) => {
+        queryClient.invalidateQueries({ queryKey: [resource] });
+        useGlobalStore.setState({ [alias]: data } as unknown as StoreType);
+        callback?.(data);
+      },
+      onError: (error) => {
+        messageError(error.response?.data?.message);
+      },
+    });
 
+    // ✅ Conditional hanya di return, bukan di pemanggilan hook
     return {
-      query,
-      createMutation,
-      updateMutation,
-      deleteMutation,
+      query: allowedMethods.includes("read") ? query : undefined,
+      createMutation: allowedMethods.includes("create")
+        ? createMutation
+        : undefined,
+      updateMutation: allowedMethods.includes("update")
+        ? updateMutation
+        : undefined,
+      deleteMutation: allowedMethods.includes("delete")
+        ? deleteMutation
+        : undefined,
       useGlobalStore,
     };
   };
