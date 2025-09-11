@@ -304,7 +304,9 @@ function ActivityHistory() {
                         <div>
                           <span className="text-gray-500">Tanggal: </span>
                           <span className="text-gray-800">
-                            {activity.tanggal_kegiatan}
+                            {moment(activity.tanggal_kegiatan).format(
+                              "DD/MM/YYYY"
+                            )}
                           </span>
                         </div>
                         <div>
