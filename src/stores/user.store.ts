@@ -22,3 +22,23 @@ export const useUserStore = create<UserStore>()(
     }
   )
 );
+
+interface TokenStore {
+  token: string | null;
+  setToken: (data: string | null) => void;
+  clearToken: () => void;
+}
+
+export const useTokenStore = create<TokenStore>()(
+  persist(
+    (set) => ({
+      token: null,
+
+      setToken: (data) => set({ token: data }),
+      clearToken: () => set({ token: null }),
+    }),
+    {
+      name: "token",
+    }
+  )
+);
