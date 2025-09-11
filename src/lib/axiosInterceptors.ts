@@ -13,6 +13,7 @@ const useAxios = axios.create({
 useAxios.interceptors.request.use(
   function (config) {
     const token = localStorage.getItem("token")?.replace(/"/g, "");
+    console.log("🚀 ~ token:", token);
 
     if (token) config.headers.Authorization = `Bearer ${token}`;
 

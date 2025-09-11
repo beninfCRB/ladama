@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 function DraftSubmissionSection() {
   return (
-    <div className="relative rounded-xl overflow-hidden shadow-lg">
+    <div className="h-full relative rounded-xl overflow-hidden shadow-lg">
       <Card className="h-full relative rounded-xl">
         <CardHeader>
           <CardTitle className="text-gray-600 font-medium">

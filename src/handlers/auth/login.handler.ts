@@ -26,7 +26,7 @@ async function handleLogout() {
 
 function setStorage(res?: ResponseType<UserType>) {
   useUserStore.getState().setUser(res?.data || null);
-  localStorage.setItem("token", JSON.stringify(res?.data?.token));
+  localStorage.setItem("token", res?.data?.token as string);
   localStorage.setItem("user_data", JSON.stringify(res?.data));
 }
 
