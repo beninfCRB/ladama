@@ -3,6 +3,7 @@ import { ShinyButton } from "@/components/magicui/shiny-button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Spinner } from "@/components/ui/shadcn-io/spinner";
+import { Dictionary, ProgressValue } from "@/lib/progress";
 import { formatRupiah } from "@/lib/rupiah";
 import { useProgressKegiatan } from "@/stores/progressKegiatan.store";
 
@@ -32,19 +33,43 @@ function ProgressSubmissionSection() {
                 <div className="flex justify-between items-start">
                   <div>
                     <p className="text-sm text-gray-600">
-                      Dalam Proses Verifikasi
+                      {
+                        Dictionary[
+                          Number(
+                            progress.data?.at(0)?.tahapan_pengajuan
+                          ) as keyof typeof Dictionary
+                        ]
+                      }
                     </p>
                   </div>
                   <div className="text-right">
                     <p className="text-sm font-medium text-gray-800">
                       #{progress?.data?.at(0)?.nomor_pengajuan}
                     </p>
-                    <p className="text-sm font-bold text-gray-800">10 %</p>
+                    <p className="text-sm font-bold text-gray-800">
+                      {
+                        ProgressValue[
+                          Number(
+                            progress.data?.at(0)?.tahapan_pengajuan
+                          ) as keyof typeof ProgressValue
+                        ]
+                      }{" "}
+                      %
+                    </p>
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Progress value={10} className="h-2" />
+                  <Progress
+                    value={
+                      ProgressValue[
+                        Number(
+                          progress.data?.at(0)?.tahapan_pengajuan
+                        ) as keyof typeof ProgressValue
+                      ]
+                    }
+                    className="h-2"
+                  />
                 </div>
 
                 <div className="flex justify-between items-center pt-2 border-t border-gray-200">
