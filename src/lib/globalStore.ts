@@ -114,6 +114,7 @@ export function createGlobalStore<T, TResource extends string>(
       onSuccess: (data) => {
         queryClient.invalidateQueries({ queryKey: [resource] });
         useGlobalStore.setState({ [alias]: data } as unknown as StoreType);
+        data?.success && toast.success(data?.success);
         callback?.(data);
       },
       onError: (error) => {
@@ -140,6 +141,7 @@ export function createGlobalStore<T, TResource extends string>(
       onSuccess: (data) => {
         queryClient.invalidateQueries({ queryKey: [resource] });
         useGlobalStore.setState({ [alias]: data } as unknown as StoreType);
+        data?.success && toast.success(data?.success);
         callback?.(data);
       },
       onError: (error) => {
@@ -165,6 +167,7 @@ export function createGlobalStore<T, TResource extends string>(
       onSuccess: (data) => {
         queryClient.invalidateQueries({ queryKey: [resource] });
         useGlobalStore.setState({ [alias]: data } as unknown as StoreType);
+        data?.success && toast.success(data?.success);
         callback?.(data);
       },
       onError: (error) => {
