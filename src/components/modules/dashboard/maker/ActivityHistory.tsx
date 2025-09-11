@@ -21,84 +21,90 @@ import {
   type ColumnDef,
 } from "@tanstack/react-table";
 import { useState } from "react";
+import {
+  useRiwayatPengajuan,
+  type RiwayatPengajuanType,
+} from "@/stores/riwayatPengajuan";
+import { formatRupiah } from "@/lib/rupiah";
+import moment from "moment";
 
-interface Activity {
-  id: string;
-  activity: string;
-  progress: string;
-  status: string;
-  fundsReceived: string;
-  budget: string;
-  date: string;
-  duration: string;
-}
+// interface Activity {
+//   id: string;
+//   activity: string;
+//   progress: string;
+//   status: string;
+//   fundsReceived: string;
+//   budget: string;
+//   date: string;
+//   duration: string;
+// }
 
-const activities: Activity[] = [
-  {
-    id: "07113-2508-00111",
-    activity: "Pelatihan 50 Orang",
-    progress: "10 %",
-    status: "Dalam Proses Verifikasi",
-    fundsReceived: "0",
-    budget: "0",
-    date: "2025-09-28",
-    duration: "1 Hari",
-  },
-  {
-    id: "07313-2508-00109",
-    activity: "Sosialisasi 50 Orang",
-    progress: "0 %",
-    status: "Selesai Ditolak",
-    fundsReceived: "0",
-    budget: "28.100.000",
-    date: "2025-09-28",
-    duration: "1 Hari",
-  },
-  {
-    id: "07313-2508-00107",
-    activity: "Penanaman Pohon 1 Hectare",
-    progress: "0 %",
-    status: "Selesai Ditolak",
-    fundsReceived: "0",
-    budget: "7.736.000",
-    date: "2025-09-27",
-    duration: "1 Hari",
-  },
-];
+// const activities: Activity[] = [
+//   {
+//     id: "07113-2508-00111",
+//     activity: "Pelatihan 50 Orang",
+//     progress: "10 %",
+//     status: "Dalam Proses Verifikasi",
+//     fundsReceived: "0",
+//     budget: "0",
+//     date: "2025-09-28",
+//     duration: "1 Hari",
+//   },
+//   {
+//     id: "07313-2508-00109",
+//     activity: "Sosialisasi 50 Orang",
+//     progress: "0 %",
+//     status: "Selesai Ditolak",
+//     fundsReceived: "0",
+//     budget: "28.100.000",
+//     date: "2025-09-28",
+//     duration: "1 Hari",
+//   },
+//   {
+//     id: "07313-2508-00107",
+//     activity: "Penanaman Pohon 1 Hectare",
+//     progress: "0 %",
+//     status: "Selesai Ditolak",
+//     fundsReceived: "0",
+//     budget: "7.736.000",
+//     date: "2025-09-27",
+//     duration: "1 Hari",
+//   },
+// ];
 
-const columns: ColumnDef<Activity>[] = [
+const columns: ColumnDef<RiwayatPengajuanType>[] = [
   {
-    accessorKey: "id",
+    accessorKey: "nomor_pengajuan",
     header: "ID Kegiatan",
     cell: ({ row }) => (
       <div className="text-gray-800 text-xs sm:text-sm">
-        {row.getValue("id")}
+        {row.getValue("nomor_pengajuan")}
       </div>
     ),
   },
   {
-    accessorKey: "activity",
+    accessorKey: "jenis_kegiatan",
     header: "Jenis Kegiatan",
     cell: ({ row }) => (
       <div className="text-gray-800 text-xs sm:text-sm">
-        {row.getValue("activity")}
+        {row.getValue("jenis_kegiatan")}
       </div>
     ),
   },
   {
-    accessorKey: "progress",
+    accessorKey: "persentase_pengajuan",
     header: "Progress",
     cell: ({ row }) => (
       <div className="text-gray-800 text-xs sm:text-sm">
-        {row.getValue("progress")}
+        {row.getValue("persentase_pengajuan")}
       </div>
     ),
   },
   {
-    accessorKey: "status",
+    accessorKey: "tahapan_pengajuan",
     header: "Status",
     cell: ({ row }) => {
-      const status = row.getValue("status") as string;
+      const status = row.getValue("tahapan_pengajuan") as string;
       return (
         <Badge
           variant="outline"
@@ -114,38 +120,38 @@ const columns: ColumnDef<Activity>[] = [
     },
   },
   {
-    accessorKey: "fundsReceived",
+    accessorKey: "dana_yang_disetujui",
     header: "Dana Diterima",
     cell: ({ row }) => (
       <div className="text-gray-800 text-xs sm:text-sm">
-        {row.getValue("fundsReceived")}
+        {formatRupiah(row.getValue("dana_yang_disetujui"))}
       </div>
     ),
   },
   {
-    accessorKey: "budget",
+    accessorKey: "dana_yang_diajukan",
     header: "Budget",
     cell: ({ row }) => (
       <div className="text-gray-800 text-xs sm:text-sm">
-        {row.getValue("budget")}
+        {formatRupiah(row.getValue("dana_yang_diajukan"))}
       </div>
     ),
   },
   {
-    accessorKey: "date",
+    accessorKey: "tanggal_kegiatan",
     header: "Tanggal",
     cell: ({ row }) => (
       <div className="text-gray-800 text-xs sm:text-sm">
-        {row.getValue("date")}
+        {moment(row.getValue("tanggal_kegiatan")).format("DD MMMM YYYY")}
       </div>
     ),
   },
   {
-    accessorKey: "duration",
+    accessorKey: "lokasi",
     header: "Durasi",
     cell: ({ row }) => (
       <div className="text-gray-800 text-xs sm:text-sm">
-        {row.getValue("duration")}
+        {row.getValue("lokasi")}
       </div>
     ),
   },
@@ -164,10 +170,13 @@ const columns: ColumnDef<Activity>[] = [
 ];
 
 function ActivityHistory() {
+  const activities = useRiwayatPengajuan().useGlobalStore(
+    (s) => s["getDataRiwayatPengajuanData"]
+  );
   const [globalFilter, setGlobalFilter] = useState("");
 
   const table = useReactTable({
-    data: activities,
+    data: activities?.data || [],
     columns,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
@@ -274,47 +283,54 @@ function ActivityHistory() {
               const activity = row.original;
               return (
                 <Card
-                  key={activity.id}
+                  key={activity.nomor_pengajuan}
                   className="p-4 hover:bg-gray-50 transition-colors duration-150 cursor-pointer"
                 >
                   <div className="space-y-2">
                     <div className="flex justify-between items-start">
                       <div>
                         <p className="font-medium text-sm text-gray-800">
-                          {activity.activity}
+                          {activity.jenis_kegiatan} {activity.jumlah}
                         </p>
-                        <p className="text-xs text-gray-500">{activity.id}</p>
+                        <p className="text-xs text-gray-500">
+                          {activity.nomor_pengajuan}
+                        </p>
                       </div>
                       <Badge
                         variant="outline"
                         className={`text-xs ${
-                          activity.status === "Dalam Proses Verifikasi"
+                          activity.tahapan_pengajuan ===
+                          "Dalam Proses Verifikasi"
                             ? "border-orange-300 text-orange-600 bg-orange-50"
                             : "border-red-300 text-red-600 bg-red-50"
                         }`}
                       >
-                        {activity.status}
+                        {activity.tahapan_pengajuan}
                       </Badge>
                     </div>
                     <div className="grid grid-cols-2 gap-2 text-xs">
                       <div>
                         <span className="text-gray-500">Progress: </span>
                         <span className="text-gray-800">
-                          {activity.progress}
+                          {activity.persentase_pengajuan}
                         </span>
                       </div>
                       <div>
                         <span className="text-gray-500">Budget: </span>
-                        <span className="text-gray-800">{activity.budget}</span>
+                        <span className="text-gray-800">
+                          {formatRupiah(activity.dana_yang_diajukan)}
+                        </span>
                       </div>
                       <div>
                         <span className="text-gray-500">Tanggal: </span>
-                        <span className="text-gray-800">{activity.date}</span>
+                        <span className="text-gray-800">
+                          {activity.tanggal_kegiatan}
+                        </span>
                       </div>
                       <div>
                         <span className="text-gray-500">Durasi: </span>
                         <span className="text-gray-800">
-                          {activity.duration}
+                          {activity.nomor_pengajuan}
                         </span>
                       </div>
                     </div>
