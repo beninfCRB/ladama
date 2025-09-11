@@ -58,7 +58,9 @@ function ProgressSubmissionSection() {
               </div>
             </>
           ) : (
-            <Spinner />
+            <div className="flex justify-center items-center h-full">
+              <Spinner />
+            </div>
           )}
         </CardContent>
       </Card>
