@@ -1,6 +1,12 @@
 "use client";
 
-import { ChevronLeft, ChevronRight, FileText, Home } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  FileText,
+  Home,
+  LogOut,
+} from "lucide-react";
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import MenuButton from "./MenuButton";
@@ -9,11 +15,13 @@ import { useUserStore } from "@/stores/user.store";
 interface SidebarNavigationProps {
   isMobile?: boolean;
   onMobileToggle?: () => void;
+  onLogout?: () => void;
 }
 
 const SidebarNavigation = ({
   isMobile = false,
   onMobileToggle,
+  onLogout,
 }: SidebarNavigationProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const location = useLocation();
@@ -23,7 +31,7 @@ const SidebarNavigation = ({
   const toggleSidebar = () => setIsExpanded((prev) => !prev);
 
   const isDashboardActive = location.pathname.includes("dashboard");
-  const isDokumenActive = location.pathname === "/dokumen";
+  const isDokumenActive = location.pathname === "/downloads/documents";
 
   const SidebarContent = () => (
     <div className="flex flex-col py-4 h-full bg-[#10a249]">
@@ -65,23 +73,41 @@ const SidebarNavigation = ({
           isMobile={isMobile}
           onClick={() => {
             if (isMobile && onMobileToggle) onMobileToggle();
-            navigate("/dokumen");
+            navigate("/downloads/documents");
           }}
         />
+
+        {isMobile && (
+          <MenuButton
+            isActive={false}
+            label="Logout"
+            icon={LogOut}
+            isExpanded={isExpanded}
+            isMobile={isMobile}
+            onClick={() => {
+              if (isMobile && onMobileToggle) onMobileToggle();
+              if (onLogout) onLogout();
+            }}
+          />
+        )}
       </div>
     </div>
   );
 
-  return isMobile ? (
-    <SidebarContent />
-  ) : (
-    <div
-      className={`${
-        isExpanded ? "w-64" : "w-16"
-      } bg-white border-r border-gray-200 transition-all duration-300 ease-in-out hidden lg:flex flex-col`}
-    >
-      <SidebarContent />
-    </div>
+  return (
+    <>
+      {isMobile ? (
+        <SidebarContent />
+      ) : (
+        <div
+          className={`${
+            isExpanded ? "w-64" : "w-16"
+          } h-screen bg-white border-r border-gray-200 transition-all duration-300 ease-in-out hidden lg:flex flex-col`}
+        >
+          <SidebarContent />
+        </div>
+      )}
+    </>
   );
 };
 

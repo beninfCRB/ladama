@@ -7,7 +7,7 @@ import { useUserStore } from "@/stores/user.store";
 import moment from "moment";
 import { useEffect, useState } from "react";
 
-function DashboardPage() {
+function DashboardMakerPage() {
   const [date, setDate] = useState(moment());
   const user = useUserStore.getState().user;
 
@@ -59,4 +59,4 @@ function DashboardPage() {
   );
 }
 
-export default DashboardPage;
+export default DashboardMakerPage;

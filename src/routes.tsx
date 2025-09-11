@@ -17,6 +17,10 @@ const authChildRoutes = stripPrefix(
   routes.filter((r: RouteObject) => r.path?.startsWith("auth")),
   "auth"
 );
+const downloadsChildRoutes = stripPrefix(
+  routes.filter((r: RouteObject) => r.path?.startsWith("downloads")),
+  "downloads"
+);
 const makerChildRoutes = stripPrefix(
   routes.filter((r: RouteObject) => r.path?.startsWith("maker")),
   "maker"
@@ -31,6 +35,22 @@ const router = createBrowserRouter([
         children: [
           ...authChildRoutes,
           { index: true, element: <Navigate to="/auth/login" replace /> },
+        ],
+      },
+    ],
+  },
+  {
+    path: "/downloads",
+    element: <ProtectedRoute />,
+    children: [
+      {
+        element: <Layout />,
+        children: [
+          ...downloadsChildRoutes,
+          {
+            index: true,
+            element: <Navigate to="/downloads/documents" replace />,
+          },
         ],
       },
     ],
