@@ -28,6 +28,19 @@ export type GlobalState<TResource extends string, T> = BaseGlobalState & {
 
 type AllowedMethods = Array<"read" | "create" | "update" | "delete">;
 
+//Helper success
+const messageSuccess = (res?: string | object[]) => {
+  if (typeof res === "string") {
+    toast.success(res);
+  } else if (Array.isArray(res)) {
+    res.forEach((message) => {
+      if (typeof message === "string") {
+        toast.success(message);
+      }
+    });
+  }
+};
+
 // Helper error
 const messageError = (
   res?: string | Array<string | string[]> | Record<string, string[]>
@@ -114,7 +127,7 @@ export function createGlobalStore<T, TResource extends string>(
       onSuccess: (data) => {
         queryClient.invalidateQueries({ queryKey: [resource] });
         useGlobalStore.setState({ [alias]: data } as unknown as StoreType);
-        data?.success && toast.success(data?.success);
+        data?.success && data?.message && messageSuccess(data.message);
         callback?.(data);
       },
       onError: (error) => {
@@ -141,7 +154,7 @@ export function createGlobalStore<T, TResource extends string>(
       onSuccess: (data) => {
         queryClient.invalidateQueries({ queryKey: [resource] });
         useGlobalStore.setState({ [alias]: data } as unknown as StoreType);
-        data?.success && toast.success(data?.success);
+        data?.success && data?.message && messageSuccess(data.message);
         callback?.(data);
       },
       onError: (error) => {
@@ -167,7 +180,7 @@ export function createGlobalStore<T, TResource extends string>(
       onSuccess: (data) => {
         queryClient.invalidateQueries({ queryKey: [resource] });
         useGlobalStore.setState({ [alias]: data } as unknown as StoreType);
-        data?.success && toast.success(data?.success);
+        data?.success && data?.message && messageSuccess(data.message);
         callback?.(data);
       },
       onError: (error) => {
