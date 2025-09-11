@@ -1,13 +1,12 @@
 import { ShinyButton } from "@/components/magicui/shiny-button";
 import { TypingAnimation } from "@/components/magicui/typing-animation";
-import { useEffect, useState } from "react";
+import { useUserStore } from "@/stores/user.store";
+import { useEffect } from "react";
 import { Outlet, useNavigate } from "react-router";
 
 export function ProtectedRoute() {
   const navigate = useNavigate();
-  const [loggedIn, setLoggedIn] = useState(
-    localStorage.getItem("token") !== null
-  );
+  const user = useUserStore.getState().user;
 
   useEffect(() => {
     const timeOut = 3600000;
@@ -15,7 +14,6 @@ export function ProtectedRoute() {
     const resetTimer = () => {
       clearTimeout(timer);
       timer = window.setTimeout(() => {
-        setLoggedIn(false);
         localStorage.removeItem("token");
         navigate("/auth/login");
       }, timeOut);
@@ -37,7 +35,7 @@ export function ProtectedRoute() {
     };
   }, [navigate]);
 
-  if (!loggedIn) {
+  if (!user) {
     return (
       <h2 className="flex flex-col justify-center items-center h-screen gap-8 p-4 lg:p-0 text-center">
         <TypingAnimation className="text-4xl text-gray-500 text-wrap">
