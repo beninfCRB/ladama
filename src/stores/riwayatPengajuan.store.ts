@@ -28,7 +28,7 @@ export const updatePersentaseTahapanPengajuan = (
 ): RiwayatPengajuanType[] => {
   return data.map((item) => ({
     ...item,
-    tahapan_pengajuan: Number(item.tahapan_pengajuan) ?? 0,
-    persentase_tahapan_pengajuan: Number(item.tahapan_pengajuan) ?? 0,
+    tahapan_pengajuan: Number(item.tahapan_pengajuan),
+    persentase_tahapan_pengajuan: Number(item.tahapan_pengajuan),
   }));
 };

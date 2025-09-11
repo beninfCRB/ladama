@@ -1,9 +1,9 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -11,24 +11,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, ChevronLeft, ChevronRight } from "lucide-react";
-import {
-  useReactTable,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  flexRender,
-  type ColumnDef,
-} from "@tanstack/react-table";
-import { useState } from "react";
+import { Dictionary, DictionaryColors, ProgressValue } from "@/lib/progress";
+import { formatRupiah } from "@/lib/rupiah";
 import {
   updatePersentaseTahapanPengajuan,
   useRiwayatPengajuan,
   type RiwayatPengajuanType,
 } from "@/stores/riwayatPengajuan.store";
-import { formatRupiah } from "@/lib/rupiah";
+import {
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  useReactTable,
+  type ColumnDef,
+} from "@tanstack/react-table";
+import { ChevronLeft, ChevronRight, Search } from "lucide-react";
 import moment from "moment";
-import { Dictionary, DictionaryColors, ProgressValue } from "@/lib/progress";
+import { useMemo, useState } from "react";
 
 const columns: ColumnDef<RiwayatPengajuanType>[] = [
   {
@@ -132,9 +132,13 @@ function ActivityHistory() {
   const activities = useRiwayatPengajuan().useGlobalStore(
     (s) => s["getDataRiwayatPengajuanData"]
   );
-  const transformedData = activities?.data
-    ? updatePersentaseTahapanPengajuan(activities.data)
-    : [];
+
+  const transformedData = useMemo(() => {
+    return activities?.data
+      ? updatePersentaseTahapanPengajuan(activities.data)
+      : [];
+  }, [activities]);
+
   const [globalFilter, setGlobalFilter] = useState("");
 
   const table = useReactTable({
