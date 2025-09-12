@@ -46,7 +46,7 @@ export function CreateSubmissionModal({}: ProposalModalProps) {
       open={modals["CreateSubmission"]}
       onOpenChange={(open) => !open && closeModal("CreateSubmission")}
     >
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl w-[90%] sm:w-full max-h-[90vh] overflow-y-auto mx-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
             <span>BUAT PENGAJUAN BARU</span>
