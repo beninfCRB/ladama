@@ -1,9 +1,12 @@
 import { BorderBeam } from "@/components/magicui/border-beam";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useModalStore } from "@/stores/allModal";
 import { Plus } from "lucide-react";
 
 function CreateSubmissionSection() {
+  const { openModal } = useModalStore();
+
   return (
     <div className="h-full relative rounded-xl overflow-hidden shadow-lg">
       <Card className="h-full relative rounded-xl">
@@ -18,6 +21,7 @@ function CreateSubmissionSection() {
               variant="ghost"
               size="icon"
               className="w-12 h-12 rounded-full border-2 border-green-500 text-green-500 hover:bg-green-50"
+              onClick={() => openModal("CreateSubmission")}
             >
               <Plus className="w-6 h-6" />
             </Button>

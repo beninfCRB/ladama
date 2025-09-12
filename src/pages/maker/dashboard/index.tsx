@@ -3,11 +3,14 @@ import ActivityHistory from "@/components/modules/dashboard/maker/ActivityHistor
 import CreateSubmissionSection from "@/components/modules/dashboard/maker/CreateSubmissionSection";
 import DraftSubmissionSection from "@/components/modules/dashboard/maker/DraftSubmissionSection";
 import ProgressSubmissionSection from "@/components/modules/dashboard/maker/ProgressSubmissionSection";
+import { CreateSubmissionModal } from "@/components/modules/dashboard/maker/submission/CreateSubmission";
 
 function DashboardMakerPage() {
   return (
     <main className="flex-1 px-3 sm:px-4 lg:px-6 py-3 sm:py-4 lg:py-6 space-y-3 sm:space-y-4 lg:space-y-6">
       <BreadCrumb />
+
+      <CreateSubmissionModal />
 
       <div className="space-y-3 sm:space-y-4 lg:space-y-0">
         <div className="lg:hidden">
@@ -29,7 +32,6 @@ function DashboardMakerPage() {
           </div>
         </div>
       </div>
-
       <div className="w-full">
         <ActivityHistory />
       </div>
