@@ -127,7 +127,10 @@ export function createGlobalStore<T, TResource extends string>(
       onSuccess: (data) => {
         queryClient.invalidateQueries({ queryKey: [resource] });
         useGlobalStore.setState({ [alias]: data } as unknown as StoreType);
-        data?.success && data?.message && messageSuccess(data.message);
+        if (data?.success && data?.message) {
+          messageSuccess(data.message);
+        }
+
         callback?.(data);
       },
       onError: (error) => {
@@ -154,7 +157,9 @@ export function createGlobalStore<T, TResource extends string>(
       onSuccess: (data) => {
         queryClient.invalidateQueries({ queryKey: [resource] });
         useGlobalStore.setState({ [alias]: data } as unknown as StoreType);
-        data?.success && data?.message && messageSuccess(data.message);
+        if (data?.success && data?.message) {
+          messageSuccess(data.message);
+        }
         callback?.(data);
       },
       onError: (error) => {
@@ -180,7 +185,9 @@ export function createGlobalStore<T, TResource extends string>(
       onSuccess: (data) => {
         queryClient.invalidateQueries({ queryKey: [resource] });
         useGlobalStore.setState({ [alias]: data } as unknown as StoreType);
-        data?.success && data?.message && messageSuccess(data.message);
+        if (data?.success && data?.message) {
+          messageSuccess(data.message);
+        }
         callback?.(data);
       },
       onError: (error) => {
@@ -188,7 +195,6 @@ export function createGlobalStore<T, TResource extends string>(
       },
     });
 
-    // ✅ Conditional hanya di return, bukan di pemanggilan hook
     return {
       query: allowedMethods.includes("read") ? query : undefined,
       createMutation: allowedMethods.includes("create")

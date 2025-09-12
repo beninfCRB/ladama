@@ -37,8 +37,9 @@ import type { JenisKelamin } from "@/types/static";
 import type { FileType } from "@/types/upload";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Check, CreditCard, FileText, Users } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router";
 
 const navigationSteps = [
   {
@@ -80,6 +81,8 @@ function AuthRegister() {
   const [activeTab, setActiveTab] = useState("step1");
   const [file, setFile] = useState<FileType | null>(null);
   const [image, setImage] = useState<FileType | null>(null);
+
+  const navigate = useNavigate();
 
   const form = useForm<registerFormType>({
     resolver: zodResolver(RegisterSchema),
@@ -170,7 +173,15 @@ function AuthRegister() {
   };
 
   const kodeAktivasi = async () => {
-    await verificationCode?.mutate({ email_pic: form.getValues("email_pic") });
+    const email = form.getValues("email_pic");
+    if (!email) {
+      form.setError("email_pic", {
+        type: "manual",
+        message: "Email tidak boleh kosong",
+      });
+      return;
+    }
+    await verificationCode?.mutate({ email_pic: email });
   };
 
   const goBack = (value: string) => {
@@ -240,6 +251,13 @@ function AuthRegister() {
       </div>
     );
   };
+
+  useEffect(() => {
+    if (register?.isSuccess) {
+      form.reset();
+      navigate("/auth/login", { replace: true });
+    }
+  }, [register?.isSuccess, form, navigate]);
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row">
@@ -573,15 +591,10 @@ function AuthRegister() {
                                 </RequiredLabel>
                                 <FormControl className="h-10">
                                   <DatePicker
-                                    value={
-                                      field.value
-                                        ? new Date(field.value)
-                                        : undefined
-                                    }
-                                    onChange={(date) =>
-                                      field.onChange(date?.toISOString())
-                                    }
+                                    value={field.value}
+                                    onChange={(date) => field.onChange(date)}
                                     placeholder="Pilih tanggal lahir"
+                                    type="date"
                                   />
                                 </FormControl>
                                 <FormMessage />
