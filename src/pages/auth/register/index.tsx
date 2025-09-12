@@ -39,7 +39,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Check, CreditCard, FileText, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router";
 
 const navigationSteps = [
   {
@@ -81,8 +80,6 @@ function AuthRegister() {
   const [activeTab, setActiveTab] = useState("step1");
   const [file, setFile] = useState<FileType | null>(null);
   const [image, setImage] = useState<FileType | null>(null);
-
-  const navigate = useNavigate();
 
   const form = useForm<registerFormType>({
     resolver: zodResolver(RegisterSchema),
@@ -255,9 +252,9 @@ function AuthRegister() {
   useEffect(() => {
     if (register?.isSuccess) {
       form.reset();
-      navigate("/auth/login", { replace: true });
+      setActiveTab("step1");
     }
-  }, [register?.isSuccess, form, navigate]);
+  }, [register?.isSuccess, form]);
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row">
