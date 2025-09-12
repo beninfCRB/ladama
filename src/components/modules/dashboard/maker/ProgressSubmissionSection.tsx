@@ -20,68 +20,72 @@ function ProgressSubmissionSection() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <>
-            <ShinyButton className="h-12 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm font-medium items-center justify-center flex rounded-br-full rounded-tl-full">
-              {`${progress?.data?.at(0)?.jenis_kegiatan} ${
-                progress?.data?.at(0)?.jumlah
-              }`}
-            </ShinyButton>
+          {progress?.data && progress?.data?.length > 0 ? (
+            <>
+              <ShinyButton className="h-12 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm font-medium items-center justify-center flex rounded-br-full rounded-tl-full">
+                {`${progress?.data?.at(0)?.jenis_kegiatan} ${
+                  progress?.data?.at(0)?.jumlah
+                }`}
+              </ShinyButton>
 
-            <div className="bg-gray-50 rounded-lg p-4 space-y-4">
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="text-sm text-gray-600">
-                    {
-                      Dictionary[
-                        Number(
-                          progress?.data?.at(0)?.tahapan_pengajuan
-                        ) as keyof typeof Dictionary
-                      ]
-                    }
-                  </p>
+              <div className="bg-gray-50 rounded-lg p-4 space-y-4">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="text-sm text-gray-600">
+                      {
+                        Dictionary[
+                          Number(
+                            progress.data?.at(0)?.tahapan_pengajuan
+                          ) as keyof typeof Dictionary
+                        ]
+                      }
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-medium text-gray-800">
+                      #{progress?.data?.at(0)?.nomor_pengajuan}
+                    </p>
+                    <p className="text-sm font-bold text-gray-800">
+                      {
+                        ProgressValue[
+                          Number(
+                            progress.data?.at(0)?.tahapan_pengajuan
+                          ) as keyof typeof ProgressValue
+                        ]
+                      }{" "}
+                      %
+                    </p>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-sm font-medium text-gray-800">
-                    #{progress?.data?.at(0)?.nomor_pengajuan}
-                  </p>
-                  <p className="text-sm font-bold text-gray-800">
-                    {
+
+                <div className="space-y-2">
+                  <Progress
+                    value={
                       ProgressValue[
                         Number(
-                          progress ? progress.data?.at(0)?.tahapan_pengajuan : 0
+                          progress.data?.at(0)?.tahapan_pengajuan
                         ) as keyof typeof ProgressValue
                       ]
-                    }{" "}
-                    %
-                  </p>
+                    }
+                    className="h-2"
+                  />
+                </div>
+
+                <div className="flex justify-between items-center pt-2 border-t border-gray-200">
+                  <span className="text-sm text-gray-600">
+                    Total dana diterima
+                  </span>
+                  <span className="font-semibold text-gray-800">
+                    {formatRupiah(progress.data?.at(0)?.dana_yang_diajukan)}
+                  </span>
                 </div>
               </div>
-
-              <div className="space-y-2">
-                <Progress
-                  value={
-                    ProgressValue[
-                      Number(
-                        progress ? progress.data?.at(0)?.tahapan_pengajuan : 0
-                      ) as keyof typeof ProgressValue
-                    ]
-                  }
-                  className="h-2"
-                />
-              </div>
-
-              <div className="flex justify-between items-center pt-2 border-t border-gray-200">
-                <span className="text-sm text-gray-600">
-                  Total dana diterima
-                </span>
-                <span className="font-semibold text-gray-800">
-                  {formatRupiah(
-                    progress ? progress.data?.at(0)?.dana_yang_diajukan : 0
-                  )}
-                </span>
-              </div>
+            </>
+          ) : (
+            <div className="flex justify-center items-center h-full">
+              Belum ada kegiatan yang diajukan
             </div>
-          </>
+          )}
         </CardContent>
       </Card>
 
