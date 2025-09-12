@@ -82,8 +82,12 @@ function ProgressSubmissionSection() {
               </div>
             </>
           ) : (
-            <div className="flex justify-center items-center h-full">
-              Belum ada kegiatan yang diajukan
+            <div className="flex flex-col justify-center items-center h-full md:py-0 lg:py-8 space-y-4 flex-1">
+              <div className="text-center py-0 lg:py-8">
+                <p className="text-gray-400">
+                  Belum ada kegiatan yang diajukan
+                </p>
+              </div>
             </div>
           )}
         </CardContent>
