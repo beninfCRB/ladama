@@ -44,7 +44,7 @@ export function CreateSubmissionModal() {
       open={modals["CreateSubmission"]}
       onOpenChange={(open) => !open && closeModal("CreateSubmission")}
     >
-      <DialogContent className="max-w-2xl w-[90%] sm:w-full max-h-[90vh] overflow-y-auto mx-auto">
+      <DialogContent className="max-w-2xl w-[90%] sm:w-full max-h-[90vh] overflow-y-auto mx-auto bg-linear-to-br from-[#17a449] to-[#A3C537] text-white">
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
             <span>BUAT PENGAJUAN BARU</span>
@@ -53,10 +53,10 @@ export function CreateSubmissionModal() {
 
         <div className="p-2 lg:p-6 space-y-6">
           <div>
-            <h3 className="text-lg font-medium text-foreground mb-2">
+            <h3 className="text-lg font-medium text-shadow-white mb-2">
               PILIH TEMA
             </h3>
-            <p className="text-sm text-muted-foreground mb-6">
+            <p className="text-sm text-shadow-white mb-6">
               Pilih tema yang anda ingin ajukan
             </p>
           </div>
