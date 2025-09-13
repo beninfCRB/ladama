@@ -11,9 +11,7 @@ import Papa from "@/assets/submission/papa.png";
 import Pana from "@/assets/submission/pana.png";
 import Amico from "@/assets/submission/amico.png";
 
-interface ProposalModalProps {}
-
-export function CreateSubmissionModal({}: ProposalModalProps) {
+export function CreateSubmissionModal() {
   const themes = [
     {
       id: "folu-school",
@@ -53,7 +51,7 @@ export function CreateSubmissionModal({}: ProposalModalProps) {
           </DialogTitle>
         </DialogHeader>
 
-        <div className="p-6 space-y-6">
+        <div className="p-2 lg:p-6 space-y-6">
           <div>
             <h3 className="text-lg font-medium text-foreground mb-2">
               PILIH TEMA
