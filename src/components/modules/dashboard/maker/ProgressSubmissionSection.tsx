@@ -22,7 +22,7 @@ function ProgressSubmissionSection() {
         <CardContent className="space-y-4">
           {progress?.data && progress?.data?.length > 0 ? (
             <>
-              <ShinyButton className="h-12 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm font-medium items-center justify-center flex rounded-br-full rounded-tl-full">
+              <ShinyButton className="h-12 pt-3 bg-[#17a449] text-white rounded-lg text-sm font-medium items-center justify-center flex rounded-br-full rounded-tl-full">
                 {`${progress?.data?.at(0)?.jenis_kegiatan} ${
                   progress?.data?.at(0)?.jumlah
                 }`}

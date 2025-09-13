@@ -34,7 +34,7 @@ const SidebarNavigation = ({
   const isDokumenActive = location.pathname === "/downloads/documents";
 
   const SidebarContent = () => (
-    <div className="flex flex-col py-4 h-full bg-[#10a249]">
+    <div className="flex flex-col py-4 h-full bg-linear-to-br from-[#17a449] to-[#A3C537]">
       <div className="flex items-center justify-between px-4 mb-4">
         {(isExpanded || isMobile) && (
           <span className="text-lg font-semibold text-gray-50">Menu</span>
