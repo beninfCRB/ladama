@@ -41,14 +41,14 @@ function CreateSubmissionSection() {
         size={300}
         delay={4}
         reverse
-        className="from-transparent via-green-200 to-transparent"
+        className="from-transparent via-green-400 to-transparent"
       />
       <BorderBeam
         borderWidth={2}
         duration={8}
         size={300}
         reverse
-        className="from-transparent via-green-200 to-transparent"
+        className="from-transparent via-green-400 to-transparent"
       />
     </div>
   );
