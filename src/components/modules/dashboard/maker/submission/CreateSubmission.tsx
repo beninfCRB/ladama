@@ -585,15 +585,8 @@ export function CreateSubmissionModal() {
                   <BorderBeam
                     borderWidth={4}
                     duration={12}
-                    size={1000}
+                    size={2000}
                     delay={4}
-                    reverse
-                    className="from-transparent via-amber-400 to-transparent"
-                  />
-                  <BorderBeam
-                    borderWidth={4}
-                    duration={12}
-                    size={1000}
                     reverse
                     className="from-transparent via-amber-400 to-transparent"
                   />
