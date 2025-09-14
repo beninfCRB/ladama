@@ -315,7 +315,7 @@ export function CreateSubmissionModal() {
 
                           {/* Jumlah Peserta */}
                           {field.value === activity.id && (
-                            <div className="flex flex-between items-center justify-between">
+                            <div className="flex flex-col lg:flex-between items-center justify-between gap-4">
                               <FormField
                                 control={form.control}
                                 name="jumlah_peserta"
