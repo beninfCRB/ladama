@@ -201,7 +201,9 @@ export function CreateSubmissionModal() {
                           </label>
                         ))
                       ) : (
-                        <Spinner />
+                        <div className="col-span-3 flex justify-center">
+                          <Spinner />
+                        </div>
                       )}
                     </div>
                   )}
@@ -257,7 +259,9 @@ export function CreateSubmissionModal() {
                           </label>
                         ))
                       ) : (
-                        <Spinner />
+                        <div className="col-span-3 flex justify-center">
+                          <Spinner />
+                        </div>
                       )}
                     </div>
                   )}
@@ -379,7 +383,9 @@ export function CreateSubmissionModal() {
                           </label>
                         ))
                       ) : (
-                        <Spinner />
+                        <div className="col-span-3 flex justify-center">
+                          <Spinner />
+                        </div>
                       )}
                     </div>
                   )}
