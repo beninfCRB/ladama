@@ -170,14 +170,7 @@ export function CreateSubmissionModal() {
                               type="radio"
                               value={theme.id}
                               checked={field.value === theme.id}
-                              onChange={() =>
-                                handleSelect(
-                                  theme.id,
-                                  field.onChange,
-                                  "subtematik",
-                                  () => fetchSubtematik(theme.id)
-                                )
-                              }
+                              onChange={() => {}}
                               onClick={() =>
                                 handleSelect(
                                   theme.id,
@@ -240,9 +233,7 @@ export function CreateSubmissionModal() {
                               type="radio"
                               value={sub.id}
                               checked={field.value === sub.id}
-                              onChange={() =>
-                                handleSelect(sub.id, field.onChange, "kegiatan")
-                              }
+                              onChange={() => {}}
                               onClick={() =>
                                 handleSelect(sub.id, field.onChange, "kegiatan")
                               }
@@ -306,12 +297,11 @@ export function CreateSubmissionModal() {
                               type="radio"
                               value={activity.id}
                               checked={field.value === activity.id}
-                              onChange={() =>
-                                handleSelect(activity.id, field.onChange)
-                              }
+                              onChange={() => {}}
                               onClick={() =>
                                 handleSelect(activity.id, field.onChange)
                               }
+                              readOnly
                               className="peer hidden"
                             />
                             <div className="flex flex-between items-center justify-between">
