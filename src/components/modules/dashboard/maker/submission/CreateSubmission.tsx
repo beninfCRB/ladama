@@ -1,49 +1,120 @@
 "use client";
 
+import Amico from "@/assets/submission/amico.png";
+import Health from "@/assets/submission/health.png";
+import Pana from "@/assets/submission/pana.png";
+import Papa from "@/assets/submission/papa.png";
+import Planting from "@/assets/submission/planting.png";
+import Protect from "@/assets/submission/protect.png";
+import Sun from "@/assets/submission/sun.png";
+import Trip from "@/assets/submission/trip.png";
+import Water from "@/assets/submission/water.png";
+
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useModalStore } from "@/stores/allModal";
-import Papa from "@/assets/submission/papa.png";
-import Pana from "@/assets/submission/pana.png";
-import Amico from "@/assets/submission/amico.png";
-import { useTematikKegiatan } from "@/stores/tematikKegiatan.store";
 import { Spinner } from "@/components/ui/shadcn-io/spinner";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useModalStore } from "@/stores/allModal";
+import { usePaketKegiatan } from "@/stores/paketKegiatan.store";
+import {
+  useSubtematikKegiatan,
+  useSubtematikKegiatanStore,
+  type subtematikKegiatanType,
+} from "@/stores/subtematikKegiatan";
+import { useTematikKegiatan } from "@/stores/tematikKegiatan.store";
+
+import { Button } from "@/components/ui/button";
+import { Form, FormField, FormMessage } from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  SubmissionSchema,
+  type submissionFormType,
+} from "@/schemas/submission.schema";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Check, CheckCheck, Megaphone } from "lucide-react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { InteractiveHoverButton } from "@/components/magicui/interactive-hover-button";
 
 export function CreateSubmissionModal() {
+  const form = useForm<submissionFormType>({
+    resolver: zodResolver(SubmissionSchema),
+    defaultValues: {
+      tematik_kegiatan_id: "",
+      subtematik_kegiatan_id: "",
+      paket_kegiatan_id: "",
+      jumlah_peserta: "",
+    },
+  });
+
   const tematik = useTematikKegiatan().useGlobalStore(
     (s) => s["tematikKegiatanData"]
   );
+  const { createMutation: createSubTematik } = useSubtematikKegiatan();
+  const { data: subTematik, setData } = useSubtematikKegiatanStore();
+  const tematikId = form.watch().tematik_kegiatan_id;
+  const subtematikId = form.watch().subtematik_kegiatan_id;
 
-  const themes = [
-    {
-      id: "folu-school",
-      title: "FOLU GOES TO SCHOOL",
-      description:
-        "Kegiatan Folu Goes to School diperuntukkan sekolah setara SMA dan dibawahnya bertujuan untuk peningkatan pengetahuan, kesadaran, dan partisipasi terhadap mitigasi/adaptasi perubahan iklim. TEST",
-      image: "/school-education-illustration.jpg",
-    },
-    {
-      id: "folu-terra",
-      title: "FOLU TERRA",
-      description:
-        "Folu Terra (Kesejahteraan Rakyat) dapat diikuti Kelompok pemuda dan komunitas pecinta lingkungan. Kegiatan yang mencakup pengelolaan sampah, energi baru dan terbarukan, dan pengelolaan DAS",
-      image: "/environmental-conservation-illustration.jpg",
-    },
-    {
-      id: "folu-biodiversity",
-      title: "FOLU BIODIVERSITY",
-      description:
-        "Kegiatan ini menyasar kelompok pemuda dan kelompok masyarakat pecinta lingkungan. Kegiatan ini mencakup kegiatan yang terkait jasa lingkungan/ekowisata, kesehatan, penghijauan/penanaman kembali, energi baru dan terbarukan, dan pengelolaan sampah.",
-      image: "/biodiversity-animals-nature-illustration.jpg",
-    },
-  ];
+  const { query: paketKegiatan } = usePaketKegiatan(tematikId, subtematikId);
+
+  const fetchSubtematik = async (id: string) => {
+    await createSubTematik?.mutate(
+      { tematik_kegiatan_id: id },
+      {
+        onSuccess: (data) => {
+          setData(data.data as subtematikKegiatanType[]);
+        },
+      }
+    );
+  };
 
   const imgUrls = [Pana, Amico, Papa];
+  const imgUrl2 = [Planting, Sun, Trip, Water, Protect, Health];
   const { modals, closeModal } = useModalStore();
+  const [activeTab, setActiveTab] = useState("tematik");
+
+  const onSubmit = (data: submissionFormType) => {
+    console.log("🚀 Form Values:", data);
+  };
+
+  const Tablist = () => (
+    <TabsList className="bg-white/20 backdrop-blur-md p-1 rounded-lg mb-4">
+      <TabsTrigger
+        value="tematik"
+        className="text-white data-[state=active]:bg-white data-[state=active]:text-black px-4 py-2 rounded-md"
+      >
+        Tematik
+      </TabsTrigger>
+      <TabsTrigger
+        value="subtematik"
+        className="text-white data-[state=active]:bg-white data-[state=active]:text-black px-4 py-2 rounded-md"
+      >
+        Subtematik
+      </TabsTrigger>
+      <TabsTrigger
+        value="kegiatan"
+        className="text-white data-[state=active]:bg-white data-[state=active]:text-black px-4 py-2 rounded-md"
+      >
+        Kegiatan
+      </TabsTrigger>
+      <TabsTrigger
+        value="paket"
+        className="text-white data-[state=active]:bg-white data-[state=active]:text-black px-4 py-2 rounded-md"
+      >
+        Paket
+      </TabsTrigger>
+    </TabsList>
+  );
 
   return (
     <Dialog
@@ -57,53 +128,253 @@ export function CreateSubmissionModal() {
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6">
-          <div>
-            <h3 className="text-lg font-medium text-shadow-white mb-2">
-              PILIH TEMA
-            </h3>
-            <p className="text-sm text-shadow-white mb-6">
-              Pilih tema yang anda ingin ajukan
-            </p>
-          </div>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <Tabs value={activeTab}>
+              {/* Tab Tematik */}
+              <TabsContent value="tematik">
+                <div>
+                  <h3 className="text-lg font-medium text-shadow-white mb-2">
+                    PILIH TEMA
+                  </h3>
+                  <p className="text-sm text-shadow-white mb-6">
+                    Pilih tema yang anda ingin ajukan
+                  </p>
+                </div>
+                <Tablist />
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {tematik?.data && tematik?.data?.length > 0 ? (
-              tematik?.data?.map((theme, index) => (
-                <button
-                  key={theme.id}
-                  type="button"
-                  className="w-full group border border-border rounded-xl p-6 transition-all duration-300 bg-card hover:cursor-pointer hover:scale-105 hover:border-2 hover:border-amber-500 hover:shadow-lg text-left focus:outline-none focus:ring-2 focus:ring-ring"
+                <FormField
+                  control={form.control}
+                  name="tematik_kegiatan_id"
+                  render={({ field }) => (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {tematik?.data && tematik?.data?.length > 0 ? (
+                        tematik?.data?.map((theme, index) => (
+                          <label
+                            key={theme.id}
+                            className="cursor-pointer group"
+                          >
+                            <input
+                              type="radio"
+                              value={theme.id}
+                              checked={field.value === theme.id}
+                              onChange={() => {
+                                field.onChange(theme.id);
+                                setActiveTab("subtematik");
+                                fetchSubtematik(theme.id);
+                              }}
+                              className="peer hidden"
+                            />
+                            <div
+                              className="w-full h-full border border-border rounded-xl p-6 transition-all duration-300 bg-card 
+                              peer-checked:border-amber-400 peer-checked:ring-2 peer-checked:ring-amber-400
+                              group-hover:scale-105 group-hover:shadow-lg flex flex-col gap-4 items-center"
+                            >
+                              <img
+                                src={imgUrls[index]}
+                                alt={imgUrls[index]}
+                                className="w-20 h-20 rounded-lg object-cover border border-border"
+                              />
+                              <h4 className="font-semibold text-card-foreground text-base">
+                                {theme.tematik_kegiatan}
+                              </h4>
+                              <p className="text-sm text-muted-foreground text-center">
+                                {theme.deskripsi_tematik}
+                              </p>
+                            </div>
+                          </label>
+                        ))
+                      ) : (
+                        <Spinner />
+                      )}
+                    </div>
+                  )}
+                />
+                <FormMessage />
+              </TabsContent>
+
+              {/* Tab Subtematik */}
+              <TabsContent value="subtematik">
+                <div>
+                  <h3 className="text-lg font-medium text-shadow-white mb-2">
+                    PILIH SUB TEMA
+                  </h3>
+                  <p className="text-sm text-shadow-white mb-6">
+                    Pilih sub tema yang anda ingin ajukan
+                  </p>
+                </div>
+                <Tablist />
+
+                <FormField
+                  control={form.control}
+                  name="subtematik_kegiatan_id"
+                  render={({ field }) => (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {subTematik && subTematik?.length > 0 ? (
+                        subTematik.map((sub, index) => (
+                          <label key={sub.id} className="cursor-pointer group">
+                            <input
+                              type="radio"
+                              value={sub.id}
+                              checked={field.value === sub.id}
+                              onChange={() => {
+                                field.onChange(sub.id);
+                                setActiveTab("kegiatan");
+                              }}
+                              className="peer hidden"
+                            />
+                            <div
+                              className="w-full h-full border border-border rounded-xl p-6 transition-all duration-300 bg-card 
+                              peer-checked:border-amber-400 peer-checked:ring-2 peer-checked:ring-amber-400
+                              group-hover:scale-105 group-hover:shadow-lg flex flex-col gap-4 items-center"
+                            >
+                              <img
+                                src={imgUrl2[index]}
+                                alt={imgUrl2[index]}
+                                className="w-20 h-20 rounded-lg object-cover border border-border"
+                              />
+                              <h4 className="font-semibold text-card-foreground text-base text-center">
+                                {sub.sub_tematik_kegiatan}
+                              </h4>
+                            </div>
+                          </label>
+                        ))
+                      ) : (
+                        <Spinner />
+                      )}
+                    </div>
+                  )}
+                />
+                <FormMessage />
+              </TabsContent>
+
+              {/* Tab Paket Kegiatan */}
+              <TabsContent value="kegiatan">
+                <div>
+                  <h3 className="text-lg font-medium text-shadow-white mb-2">
+                    PILIH KEGIATAN
+                  </h3>
+                  <p className="text-sm text-shadow-white mb-6">
+                    Pilih kegiatan yang anda ingin ajukan
+                  </p>
+                </div>
+                <Tablist />
+
+                <FormField
+                  control={form.control}
+                  name="paket_kegiatan_id"
+                  render={({ field }) => (
+                    <div className="space-y-4 p-8">
+                      {paketKegiatan?.data?.data?.map((activity) => (
+                        <label
+                          key={activity.id}
+                          className={`block border border-border rounded-lg p-4 cursor-pointer group bg-card ${
+                            field.value === activity.id
+                              ? "text-black"
+                              : "text-muted-foreground"
+                          } hover:scale-105 transition-all`}
+                        >
+                          <input
+                            type="radio"
+                            value={activity.id}
+                            checked={field.value === activity.id}
+                            onChange={() => field.onChange(activity.id)}
+                            className="peer hidden"
+                          />
+                          <div className="flex flex-between items-center justify-between">
+                            <div className="flex gap-4">
+                              <Megaphone
+                                className={`h-5 w-5 ${
+                                  field.value === activity.id
+                                    ? "text-[#17a449]"
+                                    : "text-muted-foreground"
+                                } group-hover:text-primary`}
+                              />
+                              <span
+                                className={`font-semibold ${
+                                  field.value === activity.id
+                                    ? "text-[#17a449]"
+                                    : "text-card-foreground"
+                                }`}
+                              >
+                                {activity.jenis_kegiatan}
+                              </span>
+                            </div>
+                            {field.value === activity.id ? (
+                              <CheckCheck
+                                size={30}
+                                className="text-[#17a449]"
+                              />
+                            ) : (
+                              <Check
+                                size={30}
+                                className="text-muted-foreground"
+                              />
+                            )}
+                          </div>
+
+                          {/* Jumlah Peserta */}
+                          {field.value === activity.id && (
+                            <div className="flex flex-between items-center justify-between">
+                              <FormField
+                                control={form.control}
+                                name="jumlah_peserta"
+                                render={({ field: fieldJumlah }) => (
+                                  <div className="mt-3">
+                                    <Select
+                                      value={fieldJumlah.value}
+                                      onValueChange={fieldJumlah.onChange}
+                                    >
+                                      <SelectTrigger className="w-48">
+                                        <SelectValue placeholder="Pilih Jumlah Peserta" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        {activity?.paket_kegiatan?.map(
+                                          (option) => (
+                                            <SelectItem
+                                              key={option.id}
+                                              value={option.jumlah_peserta.toString()}
+                                            >
+                                              {option.jumlah_peserta}
+                                            </SelectItem>
+                                          )
+                                        )}
+                                      </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                  </div>
+                                )}
+                              />
+                              <InteractiveHoverButton
+                                disabled={!form.watch().jumlah_peserta}
+                                className="bg-green-600 hover:bg-green-700 text-white rounded-md flex items-center justify-center font-medium"
+                              >
+                                Mulai Pengajuan
+                              </InteractiveHoverButton>
+                            </div>
+                          )}
+                        </label>
+                      ))}
+                    </div>
+                  )}
+                />
+                <FormMessage />
+              </TabsContent>
+            </Tabs>
+
+            {/* Submit button */}
+            {activeTab === "paket" && (
+              <div className="flex justify-end">
+                <Button
+                  type="submit"
+                  className="px-6 py-2 rounded-lg bg-white text-black font-semibold hover:bg-gray-100"
                 >
-                  <div className="flex flex-col items-center gap-4">
-                    <div className="flex-shrink-0">
-                      <img
-                        src={imgUrls[index]}
-                        alt={imgUrls[index]}
-                        className="w-20 h-20 rounded-lg object-cover border border-border transition-transform duration-300"
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <h4 className="font-semibold text-card-foreground text-base transition-colors">
-                          {theme.tematik_kegiatan}
-                        </h4>
-                      </div>
-                      <p className="text-sm text-muted-foreground  leading-relaxed text-justify">
-                        {theme.deskripsi_tematik}
-                      </p>
-                    </div>
-                  </div>
-                </button>
-              ))
-            ) : (
-              <div className="flex flex-row items-center justify-center">
-                {" "}
-                <Spinner />
+                  Submit
+                </Button>
               </div>
             )}
-          </div>
-        </div>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );

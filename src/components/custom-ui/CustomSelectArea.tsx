@@ -87,7 +87,7 @@ function CustomSelectArea<T extends FieldValues>({
                 <FormControl>
                   <CustomSelect<AreaStoreTypes>
                     placeholder="Pilih provinsi"
-                    data={provinsi.data?.data}
+                    data={provinsi?.data?.data}
                     fieldSetValue="id"
                     fieldName="name"
                     {...field}
@@ -110,7 +110,7 @@ function CustomSelectArea<T extends FieldValues>({
                 <FormControl>
                   <CustomSelect<AreaStoreTypes>
                     placeholder="Pilih kabupaten/kota"
-                    data={kota.data?.data?.kota}
+                    data={kota?.data?.data?.kota}
                     fieldSetValue="id"
                     fieldName="name"
                     disabled={!provinsiId}
@@ -135,7 +135,7 @@ function CustomSelectArea<T extends FieldValues>({
                 <FormControl>
                   <CustomSelect<AreaStoreTypes>
                     placeholder="Pilih kecamatan"
-                    data={kecamatan.data?.data?.kecamatan}
+                    data={kecamatan?.data?.data?.kecamatan}
                     fieldSetValue="id"
                     fieldName="name"
                     disabled={!kotaId}
@@ -157,7 +157,7 @@ function CustomSelectArea<T extends FieldValues>({
                 <FormControl>
                   <CustomSelect<AreaStoreTypes>
                     placeholder="Pilih kelurahan"
-                    data={kelurahan.data?.data?.kelurahan}
+                    data={kelurahan?.data?.data?.kelurahan}
                     fieldSetValue="id"
                     fieldName="name"
                     disabled={!kecamatanId}
