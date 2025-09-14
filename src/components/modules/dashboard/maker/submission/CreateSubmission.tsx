@@ -27,8 +27,21 @@ import {
 } from "@/stores/subtematikKegiatan";
 import { useTematikKegiatan } from "@/stores/tematikKegiatan.store";
 
+import CountTextarea from "@/components/custom-ui/CounTextarea";
+import CustomSelectArea from "@/components/custom-ui/CustomSelectArea";
+import DatePicker from "@/components/custom-ui/DatePicker";
+import FileUploadField from "@/components/custom-ui/FileUploadField";
+import RequiredLabel from "@/components/custom-ui/RequiredLabel";
+import { InteractiveHoverButton } from "@/components/magicui/interactive-hover-button";
 import { Button } from "@/components/ui/button";
-import { Form, FormField, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -44,10 +57,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Check, CheckCheck, Megaphone } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import type { FileType } from "@/types/upload";
+import { BorderBeam } from "@/components/magicui/border-beam";
 
-const tabsvalue = ["tematik", "subtematik", "kegiatan", "paket"];
+const tabsvalue = ["tematik", "subtematik", "kegiatan", "paket", "rab"];
 
 export function CreateSubmissionModal() {
+  const [file, setFile] = useState<FileType | null>(null);
   const form = useForm<submissionFormType>({
     resolver: zodResolver(SubmissionSchema),
     defaultValues: {
@@ -55,6 +71,14 @@ export function CreateSubmissionModal() {
       subtematik_kegiatan_id: "",
       paket_kegiatan_id: "",
       jumlah_peserta: "",
+      judul_pengajuan_kegiatan: "",
+      alamat_kegiatan: "",
+      provinsi_kegiatan: "",
+      kabupaten_kegiatan: "",
+      kecamatan_kegiatan: "",
+      kelurahan_kegiatan: "",
+      tanggal_kegiatan_awal: "",
+      tanggal_kegiatan_akhir: "",
     },
   });
 
@@ -99,6 +123,14 @@ export function CreateSubmissionModal() {
     if (callback) callback();
   };
 
+  const handleNext = () => {
+    setActiveTab(tabsvalue[tabsvalue.indexOf(activeTab) + 1]);
+  };
+
+  const handlePrevius = () => {
+    setActiveTab(tabsvalue[tabsvalue.indexOf(activeTab) - 1]);
+  };
+
   const Tablist = () => (
     <div className="flex flex-col items-center gap-2 mb-4">
       <TabsList className="bg-white/20 backdrop-blur-md p-1 rounded-lg flex flex-wrap gap-2 mb-8">
@@ -116,10 +148,7 @@ export function CreateSubmissionModal() {
         {tabsvalue.indexOf(activeTab) > 0 && (
           <Button
             className="bg-amber-400 hover:bg-amber-500 hover:scale-90"
-            onClick={() =>
-              tabsvalue.indexOf(activeTab) > 0 &&
-              setActiveTab(tabsvalue[tabsvalue.indexOf(activeTab) - 1])
-            }
+            onClick={() => tabsvalue.indexOf(activeTab) > 0 && handlePrevius()}
           >
             Kembali
           </Button>
@@ -352,7 +381,10 @@ export function CreateSubmissionModal() {
                                         value={fieldJumlah.value}
                                         onValueChange={fieldJumlah.onChange}
                                       >
-                                        <SelectTrigger className="w-full">
+                                        <SelectTrigger
+                                          className="w-full"
+                                          defaultChecked
+                                        >
                                           <SelectValue placeholder="Pilih Jumlah Peserta" />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -375,6 +407,14 @@ export function CreateSubmissionModal() {
                                 <Button
                                   disabled={!form.watch().jumlah_peserta}
                                   className="bg-green-600 hover:bg-green-700 hover:scale-95 text-white rounded-md flex items-center justify-center text-sm w-full lg:w-1/4"
+                                  onChange={() => {}}
+                                  onClick={() =>
+                                    handleSelect(
+                                      activity.id,
+                                      field.onChange,
+                                      "paket"
+                                    )
+                                  }
                                 >
                                   Mulai Pengajuan
                                 </Button>
@@ -392,17 +432,209 @@ export function CreateSubmissionModal() {
                 />
                 <FormMessage />
               </TabsContent>
+
+              {/* Tab Paket */}
+              <TabsContent value="paket">
+                <div className="mb-6">
+                  <h3 className="text-lg font-medium text-shadow-white mb-2">
+                    PAKET KEGIATAN
+                  </h3>
+                  <p className="text-xl text-amber-400">
+                    {
+                      paketKegiatan?.data?.data?.find(
+                        (item) => item.id === form.watch().paket_kegiatan_id
+                      )?.jenis_kegiatan
+                    }
+                  </p>
+                </div>
+                <Tablist />
+
+                <div className="relative bg-card p-6 rounded-lg overflow-hidden space-y-4 text-black">
+                  <FormField
+                    control={form.control}
+                    name="judul_pengajuan_kegiatan"
+                    render={({ field }) => (
+                      <FormItem>
+                        <RequiredLabel required>Judul kegiatan</RequiredLabel>
+                        <FormControl className="h-10">
+                          <Input
+                            {...field}
+                            type="text"
+                            placeholder="Masukkan judul kegiatan"
+                            value={field.value || ""}
+                            onChange={(e) =>
+                              field.onChange(e.target.value.toUpperCase())
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <CountTextarea
+                    name="alamat_kegiatan"
+                    label="Alamat Kegiatan"
+                    maxChars={250}
+                    control={form.control}
+                    placeholder="Masukkan alamat kegiatan"
+                  />
+
+                  <CustomSelectArea
+                    form={form}
+                    required
+                    provinsiField="provinsi_kegiatan"
+                    kabupatenField="kabupaten_kegiatan"
+                    kecamatanField="kecamatan_kegiatan"
+                    kelurahanField="kelurahan_kegiatan"
+                  />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <FormField
+                      name="tanggal_kegiatan_awal"
+                      control={form.control}
+                      render={({ field }) => (
+                        <FormItem>
+                          <RequiredLabel required>
+                            Tanggal Awal Kegiatan
+                          </RequiredLabel>
+                          <FormControl className="h-10">
+                            <DatePicker
+                              value={field.value}
+                              onChange={(date) => field.onChange(date)}
+                              placeholder="Pilih tanggal awal kegiatan"
+                              type="date"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      name="tanggal_kegiatan_akhir"
+                      control={form.control}
+                      render={({ field }) => (
+                        <FormItem>
+                          <RequiredLabel required>
+                            Tanggal Akhir Kegiatan
+                          </RequiredLabel>
+                          <FormControl className="h-10">
+                            <DatePicker
+                              value={field.value}
+                              onChange={(date) => field.onChange(date)}
+                              placeholder="Pilih tanggal akhir kegiatan"
+                              type="date"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <CountTextarea
+                    name="proposal_kegiatan"
+                    label="Latar Belakang Kegiatan"
+                    rows={6}
+                    maxChars={800}
+                    control={form.control}
+                    className="h-34"
+                    placeholder="Masukkan latar belakang kegiatan"
+                  />
+
+                  <CountTextarea
+                    name="tujuan_kegiatan"
+                    label="Tujuan Kegiatan"
+                    rows={6}
+                    maxChars={800}
+                    control={form.control}
+                    className="h-34"
+                    placeholder="Masukkan Tujuan kegiatan"
+                  />
+
+                  <CountTextarea
+                    name="ruang_lingkup_kegiatan"
+                    label="Ruang Lingkup Kegiatan"
+                    rows={6}
+                    maxChars={800}
+                    control={form.control}
+                    className="h-34"
+                    placeholder="Masukkan Ruang Lingkup kegiatan"
+                  />
+
+                  <FileUploadField
+                    name="fileDocument"
+                    control={form.control}
+                    label="Unggah Dokumen Lampiran"
+                    description="(Format: PDF, DOC, DOCX, Max 10 MB)"
+                    mode="document"
+                    valueFile={file}
+                    onFileChange={(files) => {
+                      if (files?.[0]) {
+                        const f = files[0];
+                        setFile({
+                          name: f.name,
+                          url: URL.createObjectURL(f),
+                          type: f.type,
+                        });
+                      } else {
+                        setFile(null);
+                      }
+                    }}
+                  />
+
+                  <BorderBeam
+                    borderWidth={4}
+                    duration={12}
+                    size={1000}
+                    delay={4}
+                    reverse
+                    className="from-transparent via-amber-400 to-transparent"
+                  />
+                  <BorderBeam
+                    borderWidth={4}
+                    duration={12}
+                    size={1000}
+                    reverse
+                    className="from-transparent via-amber-400 to-transparent"
+                  />
+                </div>
+              </TabsContent>
+
+              {/* Tab Paket 2 */}
+              <TabsContent value="rab">
+                <div className="mb-6">
+                  <h3 className="text-lg font-medium text-shadow-white mb-2">
+                    PAKET KEGIATAN
+                  </h3>
+                  <p className="text-xl text-amber-400">
+                    {
+                      paketKegiatan?.data?.data?.find(
+                        (item) => item.id === form.watch().paket_kegiatan_id
+                      )?.jenis_kegiatan
+                    }
+                  </p>
+                </div>
+                <Tablist />
+
+                <div className="bg-card p-6 rounded-lg space-y-4"></div>
+              </TabsContent>
             </Tabs>
 
             {/* Submit button */}
             {activeTab === "paket" && (
-              <div className="flex justify-end">
-                <Button
+              <div className="flex justify-center">
+                <InteractiveHoverButton
+                  className="bg-green-600 hover:bg-green-700 text-white rounded-xl w-2/4 lg:w-1/4 h-10 flex items-center justify-center font-medium"
+                  onClick={handleNext}
+                >
+                  Berikutnya
+                </InteractiveHoverButton>
+                {/* <Button
                   type="submit"
                   className="px-6 py-2 rounded-lg bg-white text-black font-semibold hover:bg-gray-100"
                 >
                   Submit
-                </Button>
+                </Button> */}
               </div>
             )}
           </form>

@@ -99,14 +99,14 @@ function ProgressSubmissionSection() {
         size={300}
         delay={4}
         reverse
-        className="from-transparent via-yellow-200 to-transparent"
+        className="from-transparent via-amber-400 to-transparent"
       />
       <BorderBeam
         borderWidth={2}
         duration={8}
         size={300}
         reverse
-        className="from-transparent via-yellow-200 to-transparent"
+        className="from-transparent via-amber-400 to-transparent"
       />
     </div>
   );

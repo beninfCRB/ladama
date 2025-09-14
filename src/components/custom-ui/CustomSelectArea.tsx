@@ -17,6 +17,7 @@ import RequiredLabel from "./RequiredLabel";
 
 interface CustomSelectAreaProps<T extends FieldValues> {
   form: UseFormReturn<T>;
+  className?: string;
   required: boolean;
   provinsiField: Extract<keyof T, string>;
   kabupatenField: Extract<keyof T, string>;
@@ -24,13 +25,13 @@ interface CustomSelectAreaProps<T extends FieldValues> {
   kelurahanField: Extract<keyof T, string>;
 }
 
-// 🔹 helper konversi aman
 function asPath<T extends FieldValues>(key: Extract<keyof T, string>): Path<T> {
   return key as unknown as Path<T>;
 }
 
 function CustomSelectArea<T extends FieldValues>({
   form,
+  className,
   required,
   provinsiField,
   kabupatenField,
@@ -76,7 +77,9 @@ function CustomSelectArea<T extends FieldValues>({
 
   return (
     <>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div
+        className={`grid grid-cols-1 sm:grid-cols-2 gap-4 text-black ${className}`}
+      >
         <div className="space-y-2">
           <FormField
             control={form.control}
@@ -124,7 +127,9 @@ function CustomSelectArea<T extends FieldValues>({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div
+        className={`grid grid-cols-1 sm:grid-cols-2 gap-4 text-black ${className}`}
+      >
         <div className="space-y-2">
           <FormField
             control={form.control}

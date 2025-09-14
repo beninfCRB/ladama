@@ -20,6 +20,12 @@ const SubmissionSchema = z.object({
   proposal_kegiatan: z.string().min(1, "Proposal kegiatan tidak boleh kosong."),
   waktu_kegiatan: z.string().min(1, "Waktu kegiatan tidak boleh kosong."),
   tanggal_kegiatan: z.string().min(1, "Tanggal kegiatan tidak boleh kosong."),
+  tanggal_kegiatan_awal: z
+    .string()
+    .min(1, "Tanggal kegiatan tidak boleh kosong."),
+  tanggal_kegiatan_akhir: z
+    .string()
+    .min(1, "Tanggal kegiatan tidak boleh kosong."),
   alamat_kegiatan: z.string().min(1, "Alamat kegiatan tidak boleh kosong."),
   provinsi_kegiatan: z.string().min(1, "Provinsi kegiatan tidak boleh kosong."),
   kabupaten_kegiatan: z
