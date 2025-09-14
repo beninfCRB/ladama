@@ -45,6 +45,8 @@ import { Check, CheckCheck, Megaphone } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
+const tabsvalue = ["tematik", "subtematik", "kegiatan", "paket"];
+
 export function CreateSubmissionModal() {
   const form = useForm<submissionFormType>({
     resolver: zodResolver(SubmissionSchema),
@@ -86,33 +88,44 @@ export function CreateSubmissionModal() {
     console.log("🚀 Form Values:", data);
   };
 
+  const handleSelect = (
+    value: string,
+    fieldOnChange: (val: string) => void,
+    nextTab?: string,
+    callback?: () => void
+  ) => {
+    fieldOnChange(value);
+    if (nextTab) setActiveTab(nextTab);
+    if (callback) callback();
+  };
+
   const Tablist = () => (
-    <TabsList className="bg-white/20 backdrop-blur-md p-1 rounded-lg mb-4 flex flex-wrap gap-2">
-      <TabsTrigger
-        value="tematik"
-        className="flex-1 text-white data-[state=active]:bg-white data-[state=active]:text-black px-4 py-2 rounded-md"
-      >
-        Tematik
-      </TabsTrigger>
-      <TabsTrigger
-        value="subtematik"
-        className="flex-1 text-white data-[state=active]:bg-white data-[state=active]:text-black px-4 py-2 rounded-md"
-      >
-        Subtematik
-      </TabsTrigger>
-      <TabsTrigger
-        value="kegiatan"
-        className="flex-1 text-white data-[state=active]:bg-white data-[state=active]:text-black px-4 py-2 rounded-md"
-      >
-        Kegiatan
-      </TabsTrigger>
-      <TabsTrigger
-        value="paket"
-        className="flex-1 text-white data-[state=active]:bg-white data-[state=active]:text-black px-4 py-2 rounded-md"
-      >
-        Paket
-      </TabsTrigger>
-    </TabsList>
+    <div className="flex flex-col items-center gap-2 mb-4">
+      <TabsList className="bg-white/20 backdrop-blur-md p-1 rounded-lg flex flex-wrap gap-2 mb-8">
+        {tabsvalue.map((item, index) => (
+          <TabsTrigger
+            key={index}
+            value={item}
+            className="flex-1 text-white data-[state=active]:bg-white data-[state=active]:text-black px-4 py-2 rounded-md"
+          >
+            {item.toUpperCase()}
+          </TabsTrigger>
+        ))}
+      </TabsList>
+      <div className="flex flex-row justify-between gap-2">
+        {tabsvalue.indexOf(activeTab) > 0 && (
+          <Button
+            className="bg-amber-400 hover:bg-amber-500 hover:scale-90"
+            onClick={() =>
+              tabsvalue.indexOf(activeTab) > 0 &&
+              setActiveTab(tabsvalue[tabsvalue.indexOf(activeTab) - 1])
+            }
+          >
+            Kembali
+          </Button>
+        )}
+      </div>
+    </div>
   );
 
   return (
@@ -122,7 +135,7 @@ export function CreateSubmissionModal() {
     >
       <DialogContent className="w-full h-auto max-w-[95vw] lg:max-w-screen-xl max-h-[90vh] overflow-y-auto mx-auto bg-linear-to-br from-[#17a449] to-[#A3C537] text-white p-4 sm:p-6 lg:p-8 rounded-xl">
         <DialogHeader>
-          <DialogTitle className="flex items-center justify-between">
+          <DialogTitle className="flex items-center justify-between pr-8">
             <span>BUAT PENGAJUAN BARU</span>
           </DialogTitle>
         </DialogHeader>
@@ -157,11 +170,22 @@ export function CreateSubmissionModal() {
                               type="radio"
                               value={theme.id}
                               checked={field.value === theme.id}
-                              onChange={() => {
-                                field.onChange(theme.id);
-                                setActiveTab("subtematik");
-                                fetchSubtematik(theme.id);
-                              }}
+                              onChange={() =>
+                                handleSelect(
+                                  theme.id,
+                                  field.onChange,
+                                  "subtematik",
+                                  () => fetchSubtematik(theme.id)
+                                )
+                              }
+                              onClick={() =>
+                                handleSelect(
+                                  theme.id,
+                                  field.onChange,
+                                  "subtematik",
+                                  () => fetchSubtematik(theme.id)
+                                )
+                              }
                               className="peer hidden"
                             />
                             <div
@@ -216,12 +240,15 @@ export function CreateSubmissionModal() {
                               type="radio"
                               value={sub.id}
                               checked={field.value === sub.id}
-                              onChange={() => {
-                                field.onChange(sub.id);
-                                setActiveTab("kegiatan");
-                              }}
+                              onChange={() =>
+                                handleSelect(sub.id, field.onChange, "kegiatan")
+                              }
+                              onClick={() =>
+                                handleSelect(sub.id, field.onChange, "kegiatan")
+                              }
                               className="peer hidden"
                             />
+
                             <div
                               className="h-full border border-border rounded-xl p-6 transition-all duration-300 bg-card 
                               peer-checked:border-amber-400 peer-checked:ring-2 peer-checked:ring-amber-400
@@ -279,7 +306,12 @@ export function CreateSubmissionModal() {
                               type="radio"
                               value={activity.id}
                               checked={field.value === activity.id}
-                              onChange={() => field.onChange(activity.id)}
+                              onChange={() =>
+                                handleSelect(activity.id, field.onChange)
+                              }
+                              onClick={() =>
+                                handleSelect(activity.id, field.onChange)
+                              }
                               className="peer hidden"
                             />
                             <div className="flex flex-between items-center justify-between">
@@ -348,7 +380,7 @@ export function CreateSubmissionModal() {
                                 />
                                 <Button
                                   disabled={!form.watch().jumlah_peserta}
-                                  className="bg-green-600 hover:bg-green-700 hover:scale-95 text-white rounded-md flex items-center justify-center text-sm w-full sm:w-auto"
+                                  className="bg-green-600 hover:bg-green-700 hover:scale-95 text-white rounded-md flex items-center justify-center text-sm w-full lg:w-1/4"
                                 >
                                   Mulai Pengajuan
                                 </Button>
