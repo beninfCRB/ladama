@@ -44,7 +44,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Check, CheckCheck, Megaphone } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { InteractiveHoverButton } from "@/components/magicui/interactive-hover-button";
 
 export function CreateSubmissionModal() {
   const form = useForm<submissionFormType>({
@@ -88,28 +87,28 @@ export function CreateSubmissionModal() {
   };
 
   const Tablist = () => (
-    <TabsList className="bg-white/20 backdrop-blur-md p-1 rounded-lg mb-4">
+    <TabsList className="bg-white/20 backdrop-blur-md p-1 rounded-lg mb-4 flex flex-wrap gap-2">
       <TabsTrigger
         value="tematik"
-        className="text-white data-[state=active]:bg-white data-[state=active]:text-black px-4 py-2 rounded-md"
+        className="flex-1 text-white data-[state=active]:bg-white data-[state=active]:text-black px-4 py-2 rounded-md"
       >
         Tematik
       </TabsTrigger>
       <TabsTrigger
         value="subtematik"
-        className="text-white data-[state=active]:bg-white data-[state=active]:text-black px-4 py-2 rounded-md"
+        className="flex-1 text-white data-[state=active]:bg-white data-[state=active]:text-black px-4 py-2 rounded-md"
       >
         Subtematik
       </TabsTrigger>
       <TabsTrigger
         value="kegiatan"
-        className="text-white data-[state=active]:bg-white data-[state=active]:text-black px-4 py-2 rounded-md"
+        className="flex-1 text-white data-[state=active]:bg-white data-[state=active]:text-black px-4 py-2 rounded-md"
       >
         Kegiatan
       </TabsTrigger>
       <TabsTrigger
         value="paket"
-        className="text-white data-[state=active]:bg-white data-[state=active]:text-black px-4 py-2 rounded-md"
+        className="flex-1 text-white data-[state=active]:bg-white data-[state=active]:text-black px-4 py-2 rounded-md"
       >
         Paket
       </TabsTrigger>
@@ -133,11 +132,11 @@ export function CreateSubmissionModal() {
             <Tabs value={activeTab}>
               {/* Tab Tematik */}
               <TabsContent value="tematik">
-                <div>
+                <div className="mb-6">
                   <h3 className="text-lg font-medium text-shadow-white mb-2">
                     PILIH TEMA
                   </h3>
-                  <p className="text-sm text-shadow-white mb-6">
+                  <p className="text-sm text-shadow-white">
                     Pilih tema yang anda ingin ajukan
                   </p>
                 </div>
@@ -166,16 +165,16 @@ export function CreateSubmissionModal() {
                               className="peer hidden"
                             />
                             <div
-                              className="w-full h-full border border-border rounded-xl p-6 transition-all duration-300 bg-card 
+                              className="h-full border border-border rounded-xl p-6 transition-all duration-300 bg-card 
                               peer-checked:border-amber-400 peer-checked:ring-2 peer-checked:ring-amber-400
                               group-hover:scale-105 group-hover:shadow-lg flex flex-col gap-4 items-center"
                             >
                               <img
                                 src={imgUrls[index]}
-                                alt={imgUrls[index]}
+                                alt="tema"
                                 className="w-20 h-20 rounded-lg object-cover border border-border"
                               />
-                              <h4 className="font-semibold text-card-foreground text-base">
+                              <h4 className="font-semibold text-card-foreground text-base text-center">
                                 {theme.tematik_kegiatan}
                               </h4>
                               <p className="text-sm text-muted-foreground text-center">
@@ -195,11 +194,11 @@ export function CreateSubmissionModal() {
 
               {/* Tab Subtematik */}
               <TabsContent value="subtematik">
-                <div>
+                <div className="mb-6">
                   <h3 className="text-lg font-medium text-shadow-white mb-2">
                     PILIH SUB TEMA
                   </h3>
-                  <p className="text-sm text-shadow-white mb-6">
+                  <p className="text-sm text-shadow-white">
                     Pilih sub tema yang anda ingin ajukan
                   </p>
                 </div>
@@ -224,13 +223,13 @@ export function CreateSubmissionModal() {
                               className="peer hidden"
                             />
                             <div
-                              className="w-full h-full border border-border rounded-xl p-6 transition-all duration-300 bg-card 
+                              className="h-full border border-border rounded-xl p-6 transition-all duration-300 bg-card 
                               peer-checked:border-amber-400 peer-checked:ring-2 peer-checked:ring-amber-400
                               group-hover:scale-105 group-hover:shadow-lg flex flex-col gap-4 items-center"
                             >
                               <img
                                 src={imgUrl2[index]}
-                                alt={imgUrl2[index]}
+                                alt="subtematik"
                                 className="w-20 h-20 rounded-lg object-cover border border-border"
                               />
                               <h4 className="font-semibold text-card-foreground text-base text-center">
@@ -248,13 +247,13 @@ export function CreateSubmissionModal() {
                 <FormMessage />
               </TabsContent>
 
-              {/* Tab Paket Kegiatan */}
+              {/* Tab Kegiatan */}
               <TabsContent value="kegiatan">
-                <div>
+                <div className="mb-6">
                   <h3 className="text-lg font-medium text-shadow-white mb-2">
                     PILIH KEGIATAN
                   </h3>
-                  <p className="text-sm text-shadow-white mb-6">
+                  <p className="text-sm text-shadow-white">
                     Pilih kegiatan yang anda ingin ajukan
                   </p>
                 </div>
@@ -264,97 +263,102 @@ export function CreateSubmissionModal() {
                   control={form.control}
                   name="paket_kegiatan_id"
                   render={({ field }) => (
-                    <div className="space-y-4 p-8">
-                      {paketKegiatan?.data?.data?.map((activity) => (
-                        <label
-                          key={activity.id}
-                          className={`block border border-border rounded-lg p-4 cursor-pointer group bg-card ${
-                            field.value === activity.id
-                              ? "text-black"
-                              : "text-muted-foreground"
-                          } hover:scale-105 transition-all`}
-                        >
-                          <input
-                            type="radio"
-                            value={activity.id}
-                            checked={field.value === activity.id}
-                            onChange={() => field.onChange(activity.id)}
-                            className="peer hidden"
-                          />
-                          <div className="flex flex-between items-center justify-between">
-                            <div className="flex gap-4">
-                              <Megaphone
-                                className={`h-5 w-5 ${
-                                  field.value === activity.id
-                                    ? "text-[#17a449]"
-                                    : "text-muted-foreground"
-                                } group-hover:text-primary`}
-                              />
-                              <span
-                                className={`font-semibold ${
-                                  field.value === activity.id
-                                    ? "text-[#17a449]"
-                                    : "text-card-foreground"
-                                }`}
-                              >
-                                {activity.jenis_kegiatan}
-                              </span>
+                    <div className="space-y-4 md:p-0 lg:p-8">
+                      {paketKegiatan?.data?.data &&
+                      paketKegiatan?.data?.data?.length > 0 ? (
+                        paketKegiatan?.data?.data?.map((activity) => (
+                          <label
+                            key={activity.id}
+                            className={`block border border-border rounded-lg p-4 cursor-pointer group bg-card transition-all ${
+                              field.value === activity.id
+                                ? "text-black"
+                                : "text-muted-foreground"
+                            } hover:scale-105`}
+                          >
+                            <input
+                              type="radio"
+                              value={activity.id}
+                              checked={field.value === activity.id}
+                              onChange={() => field.onChange(activity.id)}
+                              className="peer hidden"
+                            />
+                            <div className="flex flex-between items-center justify-between">
+                              <div className="flex gap-4">
+                                <Megaphone
+                                  className={`h-5 w-5 ${
+                                    field.value === activity.id
+                                      ? "text-[#17a449]"
+                                      : "text-muted-foreground"
+                                  } group-hover:text-primary`}
+                                />
+                                <span
+                                  className={`font-semibold ${
+                                    field.value === activity.id
+                                      ? "text-[#17a449]"
+                                      : "text-card-foreground"
+                                  }`}
+                                >
+                                  {activity.jenis_kegiatan}
+                                </span>
+                              </div>
+                              {field.value === activity.id ? (
+                                <CheckCheck
+                                  size={30}
+                                  className="text-[#17a449]"
+                                />
+                              ) : (
+                                <Check
+                                  size={30}
+                                  className="text-muted-foreground"
+                                />
+                              )}
                             </div>
-                            {field.value === activity.id ? (
-                              <CheckCheck
-                                size={30}
-                                className="text-[#17a449]"
-                              />
-                            ) : (
-                              <Check
-                                size={30}
-                                className="text-muted-foreground"
-                              />
-                            )}
-                          </div>
 
-                          {/* Jumlah Peserta */}
-                          {field.value === activity.id && (
-                            <div className="flex flex-col lg:flex-between items-center justify-between gap-4">
-                              <FormField
-                                control={form.control}
-                                name="jumlah_peserta"
-                                render={({ field: fieldJumlah }) => (
-                                  <div className="mt-3">
-                                    <Select
-                                      value={fieldJumlah.value}
-                                      onValueChange={fieldJumlah.onChange}
-                                    >
-                                      <SelectTrigger className="w-48">
-                                        <SelectValue placeholder="Pilih Jumlah Peserta" />
-                                      </SelectTrigger>
-                                      <SelectContent>
-                                        {activity?.paket_kegiatan?.map(
-                                          (option) => (
-                                            <SelectItem
-                                              key={option.id}
-                                              value={option.jumlah_peserta.toString()}
-                                            >
-                                              {option.jumlah_peserta}
-                                            </SelectItem>
-                                          )
-                                        )}
-                                      </SelectContent>
-                                    </Select>
-                                    <FormMessage />
-                                  </div>
-                                )}
-                              />
-                              <InteractiveHoverButton
-                                disabled={!form.watch().jumlah_peserta}
-                                className="bg-green-600 hover:bg-green-700 text-white rounded-md flex items-center justify-center font-medium"
-                              >
-                                Mulai Pengajuan
-                              </InteractiveHoverButton>
-                            </div>
-                          )}
-                        </label>
-                      ))}
+                            {/* Jumlah Peserta */}
+                            {field.value === activity.id && (
+                              <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
+                                <FormField
+                                  control={form.control}
+                                  name="jumlah_peserta"
+                                  render={({ field: fieldJumlah }) => (
+                                    <div>
+                                      <Select
+                                        value={fieldJumlah.value}
+                                        onValueChange={fieldJumlah.onChange}
+                                      >
+                                        <SelectTrigger className="w-full">
+                                          <SelectValue placeholder="Pilih Jumlah Peserta" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          {activity?.paket_kegiatan?.map(
+                                            (option) => (
+                                              <SelectItem
+                                                key={option.id}
+                                                value={option.jumlah_peserta.toString()}
+                                              >
+                                                {option.jumlah_peserta}
+                                              </SelectItem>
+                                            )
+                                          )}
+                                        </SelectContent>
+                                      </Select>
+                                      <FormMessage />
+                                    </div>
+                                  )}
+                                />
+                                <Button
+                                  disabled={!form.watch().jumlah_peserta}
+                                  className="bg-green-600 hover:bg-green-700 hover:scale-95 text-white rounded-md flex items-center justify-center text-sm w-full sm:w-auto"
+                                >
+                                  Mulai Pengajuan
+                                </Button>
+                              </div>
+                            )}
+                          </label>
+                        ))
+                      ) : (
+                        <Spinner />
+                      )}
                     </div>
                   )}
                 />
