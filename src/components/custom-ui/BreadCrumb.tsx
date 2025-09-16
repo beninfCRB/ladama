@@ -17,18 +17,34 @@ function BreadCrumb() {
 
   useEffect(() => {
     const timer = setInterval(() => {
+      if (
+        !rangeOpening?.data?.tanggal_akhir ||
+        !rangeOpening?.data?.jam_akhir
+      ) {
+        return;
+      }
+
       const now = moment();
       const end = moment(
-        `${rangeOpening?.data?.tanggal_akhir} ${rangeOpening?.data?.jam_akhir}`
+        `${rangeOpening.data.tanggal_akhir} ${rangeOpening.data.jam_akhir}`,
+        "YYYY-MM-DD HH:mm:ss"
       );
+
+      if (!end.isValid()) {
+        console.error("Invalid end date:", rangeOpening.data);
+        return;
+      }
+
       const diff = end.diff(now);
       const hours = Math.floor(diff / (1000 * 60 * 60));
       const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
       const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
       setCountdown({ hours, minutes, seconds });
     }, 1000);
+
     return () => clearInterval(timer);
-  }, []);
+  }, [rangeOpening]);
 
   return (
     <div className="hidden lg:flex lg:flex-between">
@@ -44,40 +60,39 @@ function BreadCrumb() {
           {date.format("DD MMMM YYYY, HH:mm:ss")}
         </p>
       </div>
-      <div className="flex-1 rounded-xl px-8 py-2 border bg-linear-to-br from-[#17a449] to-[#A3C537] shadow-sm text-white">
-        <div className="grid grid-cols-2 space-x-4">
-          <div className="flex flex-col">
-            Batas waktu pengajuan :
-            <span>
+      <div className="flex-1 rounded-xl px-6 py-4 border bg-gradient-to-br from-[#17a449] to-[#A3C537] shadow-sm text-white">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="flex flex-col text-center md:text-left">
+            <span className="font-medium">Batas waktu pengajuan :</span>
+            <span className="text-lg font-semibold">
               {moment(rangeOpening?.data?.tanggal_akhir)
                 .locale("id")
                 .format("DD MMMM YYYY")}
             </span>
           </div>
-          <div className="grid grid-cols-3">
+
+          <div className="grid grid-cols-3 text-center gap-4">
             <div className="flex flex-col">
-              <span className="font-bold text-xl">
-                {countdown.hours < 10 ? `0${countdown.hours}` : countdown.hours}{" "}
-                :
+              <span className="font-bold text-2xl">
+                {countdown.hours < 10 ? `0${countdown.hours}` : countdown.hours}
               </span>
-              Jam
+              <span className="text-sm">Jam</span>
             </div>
             <div className="flex flex-col">
-              <span className="font-bold text-xl">
+              <span className="font-bold text-2xl">
                 {countdown.minutes < 10
                   ? `0${countdown.minutes}`
-                  : countdown.minutes}{" "}
-                :
+                  : countdown.minutes}
               </span>
-              Menit
+              <span className="text-sm">Menit</span>
             </div>
             <div className="flex flex-col">
-              <span className="font-bold text-xl">
+              <span className="font-bold text-2xl">
                 {countdown.seconds < 10
                   ? `0${countdown.seconds}`
                   : countdown.seconds}
               </span>
-              Detik
+              <span className="text-sm">Detik</span>
             </div>
           </div>
         </div>
