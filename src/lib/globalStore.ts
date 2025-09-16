@@ -60,12 +60,16 @@ const messageError = (
 };
 
 // Factory
-export function createGlobalStore<T, TResource extends string>(
+export function createGlobalStore<
+  TResponse,
+  TResource extends string,
+  TRequest = Partial<TResponse> | FormData
+>(
   resource: TResource,
   allowedMethods: AllowedMethods = ["read", "create", "update", "delete"],
-  callback?: (res: ResponseType<T>) => void
+  callback?: (res: ResponseType<TResponse>) => void
 ) {
-  type StoreType = GlobalState<TResource, T>;
+  type StoreType = GlobalState<TResource, TResponse>;
   const alias = `${resource}Data` as `${TResource}Data`;
 
   // Zustand store
@@ -90,14 +94,15 @@ export function createGlobalStore<T, TResource extends string>(
     const queryClient = useQueryClient();
 
     // READ
-    const query: UseQueryResult<ResponseType<T>> = useQuery({
+    const query: UseQueryResult<ResponseType<TResponse>> = useQuery({
       queryKey: [resource, options?.id, options?.params],
       queryFn: async () => {
         const url = options?.id
           ? `${import.meta.env.VITE_PUBLIC_BASE_URL}/${resource}/${options.id}`
           : `${import.meta.env.VITE_PUBLIC_BASE_URL}/${resource}`;
 
-        const { data } = await useAxios.get<ResponseType<T>>(url, {
+        // NOTE: only one generic for axios -> response data type
+        const { data } = await useAxios.get<ResponseType<TResponse>>(url, {
           params: options?.params,
         });
 
@@ -110,19 +115,22 @@ export function createGlobalStore<T, TResource extends string>(
 
     // CREATE
     const createMutation: UseMutationResult<
-      ResponseType<T>,
+      ResponseType<TResponse>,
       AxiosError<{ message: string | string[] }>,
-      Partial<T>
+      TRequest
     > = useMutation({
-      mutationFn: async (payload) => {
+      // explicitly indicate return type is ResponseType<TResponse>
+      mutationFn: async (payload): Promise<ResponseType<TResponse>> => {
         if (!allowedMethods.includes("create")) {
           throw new Error("Method not allowed");
         }
-        const { data } = await useAxios.post<ResponseType<T>>(
+
+        // IMPORTANT: only provide the response-data generic for axios
+        const response = await useAxios.post<ResponseType<TResponse>>(
           `${import.meta.env.VITE_PUBLIC_BASE_URL}/${resource}`,
           payload
         );
-        return data;
+        return response.data;
       },
       onSuccess: (data) => {
         queryClient.invalidateQueries({ queryKey: [resource] });
@@ -140,19 +148,20 @@ export function createGlobalStore<T, TResource extends string>(
 
     // UPDATE
     const updateMutation: UseMutationResult<
-      ResponseType<T>,
+      ResponseType<TResponse>,
       AxiosError<{ message: string | string[] }>,
-      { id: string | number; payload: Partial<T> }
+      { id: string | number; payload: TRequest }
     > = useMutation({
-      mutationFn: async ({ id, payload }) => {
+      mutationFn: async ({ id, payload }): Promise<ResponseType<TResponse>> => {
         if (!allowedMethods.includes("update")) {
           throw new Error("Method not allowed");
         }
-        const { data } = await useAxios.put<ResponseType<T>>(
+
+        const response = await useAxios.put<ResponseType<TResponse>>(
           `${import.meta.env.VITE_PUBLIC_BASE_URL}/${resource}/${id}`,
           payload
         );
-        return data;
+        return response.data;
       },
       onSuccess: (data) => {
         queryClient.invalidateQueries({ queryKey: [resource] });
@@ -169,18 +178,19 @@ export function createGlobalStore<T, TResource extends string>(
 
     // DELETE
     const deleteMutation: UseMutationResult<
-      ResponseType<T>,
+      ResponseType<TResponse>,
       AxiosError<{ message: string | string[] }>,
       string | number
     > = useMutation({
-      mutationFn: async (id) => {
+      mutationFn: async (id): Promise<ResponseType<TResponse>> => {
         if (!allowedMethods.includes("delete")) {
           throw new Error("Method not allowed");
         }
-        const { data } = await useAxios.delete<ResponseType<T>>(
+
+        const response = await useAxios.delete<ResponseType<TResponse>>(
           `${import.meta.env.VITE_PUBLIC_BASE_URL}/${resource}/${id}`
         );
-        return data;
+        return response.data;
       },
       onSuccess: (data) => {
         queryClient.invalidateQueries({ queryKey: [resource] });

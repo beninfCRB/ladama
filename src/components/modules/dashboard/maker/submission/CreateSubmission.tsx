@@ -20,11 +20,7 @@ import { Spinner } from "@/components/ui/shadcn-io/spinner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useModalStore } from "@/stores/allModal";
 import { usePaketKegiatan } from "@/stores/paketKegiatan.store";
-import {
-  useSubtematikKegiatan,
-  useSubtematikKegiatanStore,
-  type subtematikKegiatanType,
-} from "@/stores/subtematikKegiatan";
+import { useSubtematikKegiatan } from "@/stores/subtematikKegiatan";
 import { useTematikKegiatan } from "@/stores/tematikKegiatan.store";
 
 import CountTextarea from "@/components/custom-ui/CounTextarea";
@@ -32,6 +28,7 @@ import CustomSelectArea from "@/components/custom-ui/CustomSelectArea";
 import DatePicker from "@/components/custom-ui/DatePicker";
 import FileUploadField from "@/components/custom-ui/FileUploadField";
 import RequiredLabel from "@/components/custom-ui/RequiredLabel";
+import { BorderBeam } from "@/components/magicui/border-beam";
 import { InteractiveHoverButton } from "@/components/magicui/interactive-hover-button";
 import { Button } from "@/components/ui/button";
 import {
@@ -49,16 +46,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { convertToFormData } from "@/lib/convertToFormData";
 import {
   SubmissionSchema,
   type submissionFormType,
 } from "@/schemas/submission.schema";
+import { usePengajuanKegiatan } from "@/stores/pengajuanKegiatan.store";
+import type { FileType } from "@/types/upload";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Check, CheckCheck, Megaphone } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import type { FileType } from "@/types/upload";
-import { BorderBeam } from "@/components/magicui/border-beam";
 
 const tabsvalue = ["tematik", "subtematik", "kegiatan", "paket", "rab"];
 
@@ -85,22 +83,22 @@ export function CreateSubmissionModal() {
   const tematik = useTematikKegiatan().useGlobalStore(
     (s) => s["tematikKegiatanData"]
   );
-  const { createMutation: createSubTematik } = useSubtematikKegiatan();
-  const { data: subTematik, setData } = useSubtematikKegiatanStore();
+  const { createMutation: createSubTematik, useGlobalStore: subTematikStore } =
+    useSubtematikKegiatan();
+  const subTematik = subTematikStore((s) => s["subTematikKegiatanData"]);
   const tematikId = form.watch().tematik_kegiatan_id;
   const subtematikId = form.watch().subtematik_kegiatan_id;
-
   const { query: paketKegiatan } = usePaketKegiatan(tematikId, subtematikId);
+  const {
+    createMutation: createPengajuan,
+    useGlobalStore: pengajuanKegiatanStore,
+  } = usePengajuanKegiatan();
+  const pengajuanKegiatan = pengajuanKegiatanStore(
+    (s) => s["pengajuanKegiatanData"]
+  );
 
   const fetchSubtematik = async (id: string) => {
-    await createSubTematik?.mutate(
-      { tematik_kegiatan_id: id },
-      {
-        onSuccess: (data) => {
-          setData(data.data as subtematikKegiatanType[]);
-        },
-      }
-    );
+    await createSubTematik?.mutate({ tematik_kegiatan_id: id });
   };
 
   const imgUrls = [Pana, Amico, Papa];
@@ -108,8 +106,9 @@ export function CreateSubmissionModal() {
   const { modals, closeModal } = useModalStore();
   const [activeTab, setActiveTab] = useState("tematik");
 
-  const onSubmit = (data: submissionFormType) => {
-    console.log("🚀 Form Values:", data);
+  const onSubmit = async (values: submissionFormType) => {
+    const formData = convertToFormData(values);
+    await createPengajuan?.mutate(formData);
   };
 
   const handleSelect = (
@@ -123,13 +122,39 @@ export function CreateSubmissionModal() {
     if (callback) callback();
   };
 
-  const handleNext = () => {
-    setActiveTab(tabsvalue[tabsvalue.indexOf(activeTab) + 1]);
+  const handleNext = async () => {
+    if (tabsvalue.indexOf(activeTab) === tabsvalue.length) {
+      await form.trigger([
+        "tematik_kegiatan_id",
+        "subtematik_kegiatan_id",
+        "paket_kegiatan_id",
+        "jumlah_peserta",
+        "judul_pengajuan_kegiatan",
+        "alamat_kegiatan",
+        "provinsi_kegiatan",
+        "kabupaten_kegiatan",
+        "kecamatan_kegiatan",
+        "kelurahan_kegiatan",
+        "tanggal_kegiatan_awal",
+        "tanggal_kegiatan_akhir",
+        "alamat_kegiatan",
+        "proposal_kegiatan",
+        "tujuan_kegiatan",
+        "ruang_lingkup_kegiatan",
+        "fileDocument",
+      ]);
+    }
   };
 
   const handlePrevius = () => {
     setActiveTab(tabsvalue[tabsvalue.indexOf(activeTab) - 1]);
   };
+
+  useEffect(() => {
+    if (createPengajuan?.isSuccess) {
+      setActiveTab("rab");
+    }
+  }, [createPengajuan?.isSuccess]);
 
   const Tablist = () => (
     <div className="flex flex-col items-center gap-2 mb-4">
@@ -144,16 +169,6 @@ export function CreateSubmissionModal() {
           </TabsTrigger>
         ))}
       </TabsList>
-      <div className="flex flex-row justify-between gap-2">
-        {tabsvalue.indexOf(activeTab) > 0 && (
-          <Button
-            className="bg-amber-400 hover:bg-amber-500 hover:scale-90"
-            onClick={() => tabsvalue.indexOf(activeTab) > 0 && handlePrevius()}
-          >
-            Kembali
-          </Button>
-        )}
-      </div>
     </div>
   );
 
@@ -257,8 +272,8 @@ export function CreateSubmissionModal() {
                   name="subtematik_kegiatan_id"
                   render={({ field }) => (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {subTematik && subTematik?.length > 0 ? (
-                        subTematik.map((sub, index) => (
+                      {subTematik?.data && subTematik?.data?.length > 0 ? (
+                        subTematik?.data?.map((sub, index) => (
                           <label key={sub.id} className="cursor-pointer group">
                             <input
                               type="radio"
@@ -599,7 +614,7 @@ export function CreateSubmissionModal() {
                 </div>
               </TabsContent>
 
-              {/* Tab Paket 2 */}
+              {/* Tab Paket rab */}
               <TabsContent value="rab">
                 <div className="mb-6">
                   <h3 className="text-lg font-medium text-shadow-white mb-2">
@@ -620,22 +635,53 @@ export function CreateSubmissionModal() {
             </Tabs>
 
             {/* Submit button */}
-            {activeTab === "paket" && (
-              <div className="flex justify-center">
-                <InteractiveHoverButton
-                  className="bg-green-600 hover:bg-green-700 text-white rounded-xl w-2/4 lg:w-1/4 h-10 flex items-center justify-center font-medium"
-                  onClick={handleNext}
-                >
-                  Berikutnya
-                </InteractiveHoverButton>
-                {/* <Button
-                  type="submit"
-                  className="px-6 py-2 rounded-lg bg-white text-black font-semibold hover:bg-gray-100"
-                >
-                  Submit
-                </Button> */}
+            <div className="flex flex-col flex-1 bg-card p-6 rounded-lg border space-y-1 text-muted-foreground text-sm gap-4">
+              <div className="flex flex-col">
+                <div className="flex items-center gap-2 text-[#17a449] text-sm">
+                  <span className="text-muted-foreground">Tematik :</span>
+                  <span className="text-[#17a449] text-sm">
+                    {tematik?.data?.find(
+                      (item) => item.id === form.watch().tematik_kegiatan_id
+                    )?.tematik_kegiatan ?? "-"}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 text-[#17a449] text-sm">
+                  <span className="text-muted-foreground">Subtematik :</span>
+                  <span className="text-[#17a449] text-sm">
+                    {subTematik?.data?.find(
+                      (item) => item.id === form.watch().subtematik_kegiatan_id
+                    )?.sub_tematik_kegiatan ?? "-"}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 text-[#17a449] text-sm">
+                  <span className="text-muted-foreground">Kegiatan :</span>
+                  <span className="text-[#17a449] text-sm">
+                    {paketKegiatan?.data?.data?.find(
+                      (item) => item.id === form.watch().paket_kegiatan_id
+                    )?.jenis_kegiatan ?? "-"}{" "}
+                    {form.watch().jumlah_peserta ?? "-"}
+                  </span>
+                </div>
               </div>
-            )}
+              <div className="flex lg:justify-end gap-4 w-full">
+                {tabsvalue.indexOf(activeTab) > 0 && (
+                  <Button
+                    className="bg-amber-400 hover:bg-amber-500 hover:scale-90 rounded-xl h-10"
+                    onClick={() => handlePrevius()}
+                  >
+                    Kembali
+                  </Button>
+                )}
+                {activeTab === "paket" && (
+                  <InteractiveHoverButton
+                    className="bg-green-600 hover:bg-green-700 text-white rounded-xl h-10 flex items-center justify-center font-medium"
+                    onClick={handleNext}
+                  >
+                    Berikutnya
+                  </InteractiveHoverButton>
+                )}
+              </div>
+            </div>
           </form>
         </Form>
       </DialogContent>
