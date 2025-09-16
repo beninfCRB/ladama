@@ -345,10 +345,10 @@ function AuthRegister() {
                 <div className="text-sm text-gray-500">
                   LANGKAH
                   {activeTab === "step1"
-                    ? "1"
+                    ? " 1 "
                     : activeTab === "step2"
-                    ? "2"
-                    : "3"}
+                    ? " 2 "
+                    : " 3 "}
                   DARI 3
                 </div>
                 <TimelineProgress />
