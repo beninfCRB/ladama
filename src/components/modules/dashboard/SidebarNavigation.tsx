@@ -1,5 +1,7 @@
 "use client";
 
+import Coutndown from "@/components/custom-ui/Coutndown";
+import { useUserStore } from "@/stores/user.store";
 import {
   ChevronLeft,
   ChevronRight,
@@ -10,7 +12,6 @@ import {
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import MenuButton from "./MenuButton";
-import { useUserStore } from "@/stores/user.store";
 
 interface SidebarNavigationProps {
   isMobile?: boolean;
@@ -34,8 +35,9 @@ const SidebarNavigation = ({
   const isDokumenActive = location.pathname === "/downloads/documents";
 
   const SidebarContent = () => (
-    <div className="flex flex-col py-4 h-full bg-linear-to-br from-[#17a449] to-[#A3C537]">
-      <div className="flex items-center justify-between px-4 mb-4">
+    <div className="flex flex-col h-full bg-linear-to-br from-[#17a449] to-[#A3C537]">
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 py-4">
         {(isExpanded || isMobile) && (
           <span className="text-lg font-semibold text-gray-50">Menu</span>
         )}
@@ -53,7 +55,8 @@ const SidebarNavigation = ({
         )}
       </div>
 
-      <div className="space-y-2 px-2">
+      {/* Menu list */}
+      <div className="flex-1 space-y-2 px-2">
         <MenuButton
           isActive={isDashboardActive}
           label="Dashboard"
@@ -91,6 +94,12 @@ const SidebarNavigation = ({
           />
         )}
       </div>
+
+      {isMobile && (
+        <div className="p-4 border-t border-white/30">
+          <Coutndown />
+        </div>
+      )}
     </div>
   );
 
