@@ -475,6 +475,7 @@ export function CreateSubmissionModal() {
                   <CountTextarea
                     name="alamat_kegiatan"
                     label="Alamat Kegiatan"
+                    rows={3}
                     maxChars={250}
                     control={form.control}
                     placeholder="Masukkan alamat kegiatan"

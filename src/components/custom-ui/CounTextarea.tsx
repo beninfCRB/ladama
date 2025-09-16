@@ -22,6 +22,7 @@ function CountTextarea<T extends FieldValues>({
   label = "Alamat",
   required = false,
   maxChars = 200,
+  rows = 4,
   className,
   ...props
 }: CountTextareaProps<T>) {
@@ -33,18 +34,31 @@ function CountTextarea<T extends FieldValues>({
         const currentLength = field.value?.length || 0;
         const nearLimit = maxChars - currentLength <= 10;
 
+        const handleInput = (e: React.FormEvent<HTMLTextAreaElement>) => {
+          const target = e.currentTarget;
+          target.style.height = "auto";
+          target.style.height = `${target.scrollHeight}px`;
+          field.onChange(e);
+        };
+
         return (
-          <FormItem>
+          <FormItem className="resize-none">
             {label && (
               <RequiredLabel required={required}>{label}</RequiredLabel>
             )}
-            <FormControl className="relative">
-              <div>
+            <FormControl className="relative w-full">
+              <div className="relative">
                 <Textarea
                   {...field}
                   {...props}
                   maxLength={maxChars}
-                  className={cn("h-24 pr-14", className)}
+                  onInput={handleInput}
+                  rows={rows}
+                  cols={1}
+                  className={cn(
+                    "w-full min-h-[96px] resize-none whitespace-pre-wrap break-words overflow-hidden pr-14 sm:text-sm md:text-base text-wrap",
+                    className
+                  )}
                   placeholder={props.placeholder ?? `Masukkan ${label}`}
                 />
                 <span
