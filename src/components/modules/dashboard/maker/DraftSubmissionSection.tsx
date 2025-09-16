@@ -6,7 +6,7 @@ function DraftSubmissionSection() {
     <div className="h-full relative rounded-xl overflow-hidden shadow-lg">
       <Card className="h-full relative rounded-xl">
         <CardHeader>
-          <CardTitle className="text-gray-600 font-medium">
+          <CardTitle className="text-gray-600 font-medium text-xl">
             DRAFT PENGAJUAN
           </CardTitle>
         </CardHeader>

@@ -376,32 +376,37 @@ export function CreateSubmissionModal() {
                                   control={form.control}
                                   name="jumlah_peserta"
                                   render={({ field: fieldJumlah }) => (
-                                    <div>
-                                      <Select
-                                        value={fieldJumlah.value}
-                                        onValueChange={fieldJumlah.onChange}
-                                      >
-                                        <SelectTrigger
-                                          className="w-full"
-                                          defaultChecked
+                                    <FormItem>
+                                      <RequiredLabel required>
+                                        Jumlah Peserta
+                                      </RequiredLabel>
+                                      <FormControl>
+                                        <Select
+                                          value={fieldJumlah.value}
+                                          onValueChange={fieldJumlah.onChange}
                                         >
-                                          <SelectValue placeholder="Pilih Jumlah Peserta" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                          {activity?.paket_kegiatan?.map(
-                                            (option) => (
-                                              <SelectItem
-                                                key={option.id}
-                                                value={option.jumlah_peserta.toString()}
-                                              >
-                                                {option.jumlah_peserta}
-                                              </SelectItem>
-                                            )
-                                          )}
-                                        </SelectContent>
-                                      </Select>
+                                          <SelectTrigger
+                                            className="w-full"
+                                            defaultChecked
+                                          >
+                                            <SelectValue placeholder="Pilih Jumlah Peserta" />
+                                          </SelectTrigger>
+                                          <SelectContent>
+                                            {activity?.paket_kegiatan?.map(
+                                              (option) => (
+                                                <SelectItem
+                                                  key={option.id}
+                                                  value={option.jumlah_peserta.toString()}
+                                                >
+                                                  {option.jumlah_peserta}
+                                                </SelectItem>
+                                              )
+                                            )}
+                                          </SelectContent>
+                                        </Select>
+                                      </FormControl>
                                       <FormMessage />
-                                    </div>
+                                    </FormItem>
                                   )}
                                 />
                                 <Button

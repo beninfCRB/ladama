@@ -17,8 +17,10 @@ function DashboardMakerPage() {
           <ProgressSubmissionSection />
         </div>
 
-        <div className="hidden lg:grid lg:grid-cols-3 lg:gap-6">
-          <ProgressSubmissionSection />
+        <div className="hidden lg:grid lg:grid-cols-4 lg:gap-6">
+          <div className="col-span-2">
+            <ProgressSubmissionSection />
+          </div>
           <CreateSubmissionSection />
           <DraftSubmissionSection />
         </div>

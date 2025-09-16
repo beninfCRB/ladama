@@ -15,14 +15,14 @@ function ProgressSubmissionSection() {
     <div className="relative rounded-xl overflow-hidden shadow-lg">
       <Card className="h-full relative rounded-xl">
         <CardHeader>
-          <CardTitle className="text-gray-600 font-medium">
+          <CardTitle className="text-gray-600 font-medium text-xl">
             PROGRESS KEGIATAN
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           {progress?.data && progress?.data?.length > 0 ? (
             <>
-              <ShinyButton className="h-12 pt-3 bg-[#17a449] text-white rounded-lg text-sm font-medium items-center justify-center flex rounded-br-full rounded-tl-full">
+              <ShinyButton className="h-12 pt-3 bg-[#17a449] text-white rounded-lg text-lg font-medium items-center justify-center flex rounded-br-full rounded-tl-full">
                 {`${progress?.data?.at(0)?.jenis_kegiatan} ${
                   progress?.data?.at(0)?.jumlah
                 }`}
@@ -31,7 +31,7 @@ function ProgressSubmissionSection() {
               <div className="bg-gray-50 rounded-lg p-4 space-y-4">
                 <div className="flex justify-between items-start">
                   <div>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-lg text-gray-600">
                       {
                         Dictionary[
                           Number(
