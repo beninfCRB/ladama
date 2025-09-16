@@ -215,7 +215,7 @@ function AuthLogin() {
             Selamat Datang di
           </h1>
           <h2 className="text-xl lg:text-3xl font-bold text-white leading-tight mb-8">
-            Layanan Data Masyarakat untuk Lingkungan
+            Layanan Dana Masyarakat untuk Lingkungan
           </h2>
         </div>
 
