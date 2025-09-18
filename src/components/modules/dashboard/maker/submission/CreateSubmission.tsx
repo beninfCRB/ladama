@@ -29,7 +29,7 @@ import DatePicker from "@/components/custom-ui/DatePicker";
 import FileUploadField from "@/components/custom-ui/FileUploadField";
 import RequiredLabel from "@/components/custom-ui/RequiredLabel";
 import { BorderBeam } from "@/components/magicui/border-beam";
-import { InteractiveHoverButton } from "@/components/magicui/interactive-hover-button";
+import { ShinyButton } from "@/components/magicui/shiny-button";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -53,13 +53,14 @@ import {
 } from "@/schemas/submission.schema";
 import {
   usePengajuanKegiatan,
-  useRabPengajuanKegiatan,
+  type KomponenRabArrayTypes,
 } from "@/stores/pengajuanKegiatan.store";
 import type { FileType } from "@/types/upload";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Check, CheckCheck, Megaphone } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { set } from "zod";
 
 const tabsvalue = ["tematik", "subtematik", "kegiatan", "paket", "rab"];
 
@@ -99,7 +100,15 @@ export function CreateSubmissionModal() {
   const pengajuanKegiatan = pengajuanKegiatanStore(
     (s) => s["pengajuanKegiatanData"]
   );
-  const rabPengajuanKegiatan = useRabPengajuanKegiatan();
+  const [rab, setRab] = useState<KomponenRabArrayTypes | undefined>();
+
+  const fetchRabPengajuanKegiatan = async (id?: string) => {
+    if (createPengajuan?.data && !id) {
+      setRab(pengajuanKegiatan?.data);
+    } else {
+      setRab(undefined);
+    }
+  };
 
   const fetchSubtematik = async (id: string) => {
     await createSubTematik?.mutate({ tematik_kegiatan_id: id });
@@ -112,7 +121,9 @@ export function CreateSubmissionModal() {
 
   const onSubmit = async (values: submissionFormType) => {
     const formData = convertToFormData(values);
+    console.log("🚀 ~ onSubmit ~ formData:", formData);
     await createPengajuan?.mutate(formData);
+    setActiveTab("rab");
   };
 
   const handleSelect = (
@@ -126,30 +137,6 @@ export function CreateSubmissionModal() {
     if (callback) callback();
   };
 
-  const handleNext = async () => {
-    if (tabsvalue.indexOf(activeTab) === tabsvalue.length) {
-      await form.trigger([
-        "tematik_kegiatan_id",
-        "subtematik_kegiatan_id",
-        "paket_kegiatan_id",
-        "jumlah_peserta",
-        "judul_pengajuan_kegiatan",
-        "alamat_kegiatan",
-        "provinsi_kegiatan",
-        "kabupaten_kegiatan",
-        "kecamatan_kegiatan",
-        "kelurahan_kegiatan",
-        "tanggal_kegiatan_awal",
-        "tanggal_kegiatan_akhir",
-        "alamat_kegiatan",
-        "proposal_kegiatan",
-        "tujuan_kegiatan",
-        "ruang_lingkup_kegiatan",
-        "fileDocument",
-      ]);
-    }
-  };
-
   const handlePrevius = () => {
     setActiveTab(tabsvalue[tabsvalue.indexOf(activeTab) - 1]);
   };
@@ -157,6 +144,7 @@ export function CreateSubmissionModal() {
   useEffect(() => {
     if (createPengajuan?.isSuccess) {
       setActiveTab("rab");
+      fetchRabPengajuanKegiatan();
     }
   }, [createPengajuan?.isSuccess]);
 
@@ -397,7 +385,11 @@ export function CreateSubmissionModal() {
                                   render={({ field: fieldJumlah }) => (
                                     <FormItem>
                                       <RequiredLabel required>
-                                        Jumlah Peserta
+                                        Jumlah{" "}
+                                        {activity.jenis_kegiatan.toLowerCase() ===
+                                        "penanaman pohon"
+                                          ? " Hektar"
+                                          : " Orang"}
                                       </RequiredLabel>
                                       <FormControl>
                                         <Select
@@ -408,7 +400,7 @@ export function CreateSubmissionModal() {
                                             className="w-full"
                                             defaultChecked
                                           >
-                                            <SelectValue placeholder="Pilih Jumlah Peserta" />
+                                            <SelectValue placeholder="Pilih Jumlah" />
                                           </SelectTrigger>
                                           <SelectContent>
                                             {activity?.paket_kegiatan?.map(
@@ -468,7 +460,21 @@ export function CreateSubmissionModal() {
                       paketKegiatan?.data?.data?.find(
                         (item) => item.id === form.watch().paket_kegiatan_id
                       )?.jenis_kegiatan
-                    }
+                    }{" "}
+                    {form.watch().jumlah_peserta}
+                    {paketKegiatan?.data?.data
+                      ?.find(
+                        (item) => item.id === form.watch().paket_kegiatan_id
+                      )
+                      ?.jenis_kegiatan.toLowerCase() === "penanaman pohon"
+                      ? " Hektar"
+                      : paketKegiatan?.data?.data
+                          ?.find(
+                            (item) => item.id === form.watch().paket_kegiatan_id
+                          )
+                          ?.jenis_kegiatan.toLowerCase() === undefined
+                      ? ""
+                      : " Orang"}
                   </p>
                 </div>
                 <Tablist />
@@ -485,10 +491,6 @@ export function CreateSubmissionModal() {
                             {...field}
                             type="text"
                             placeholder="Masukkan judul kegiatan"
-                            value={field.value || ""}
-                            onChange={(e) =>
-                              field.onChange(e.target.value.toUpperCase())
-                            }
                           />
                         </FormControl>
                         <FormMessage />
@@ -664,6 +666,19 @@ export function CreateSubmissionModal() {
                       (item) => item.id === form.watch().paket_kegiatan_id
                     )?.jenis_kegiatan ?? "-"}{" "}
                     {form.watch().jumlah_peserta ?? "-"}
+                    {paketKegiatan?.data?.data
+                      ?.find(
+                        (item) => item.id === form.watch().paket_kegiatan_id
+                      )
+                      ?.jenis_kegiatan.toLowerCase() === "penanaman pohon"
+                      ? " Hektar"
+                      : paketKegiatan?.data?.data
+                          ?.find(
+                            (item) => item.id === form.watch().paket_kegiatan_id
+                          )
+                          ?.jenis_kegiatan.toLowerCase() === undefined
+                      ? ""
+                      : " Orang"}
                   </span>
                 </div>
               </div>
@@ -677,12 +692,13 @@ export function CreateSubmissionModal() {
                   </Button>
                 )}
                 {activeTab === "paket" && (
-                  <InteractiveHoverButton
+                  <ShinyButton
+                    type="submit"
                     className="bg-green-600 hover:bg-green-700 text-white rounded-xl h-10 flex items-center justify-center font-medium"
-                    onClick={handleNext}
+                    disabled={createPengajuan?.isPending}
                   >
-                    Berikutnya
-                  </InteractiveHoverButton>
+                    {createPengajuan?.isPending ? <Spinner /> : "Berikutnya"}
+                  </ShinyButton>
                 )}
               </div>
             </div>

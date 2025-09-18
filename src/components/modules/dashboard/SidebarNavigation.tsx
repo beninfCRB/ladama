@@ -13,6 +13,7 @@ import { useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import MenuButton from "./MenuButton";
 import { useRangeOpening } from "@/stores/rangeOpening.store";
+import moment from "moment";
 
 interface SidebarNavigationProps {
   isMobile?: boolean;
@@ -31,6 +32,15 @@ const SidebarNavigation = ({
   const { user } = useUserStore();
   const rangeOpening = useRangeOpening().useGlobalStore(
     (s) => s["getRangeOpeningData"]
+  );
+
+  const [isBeforeDeadline] = useState(
+    moment().isBefore(
+      moment(
+        `${rangeOpening?.data?.tanggal_akhir} ${rangeOpening?.data?.jam_akhir}`,
+        "YYYY-MM-DD HH:mm:ss"
+      )
+    )
   );
 
   const toggleSidebar = () => setIsExpanded((prev) => !prev);
@@ -99,7 +109,7 @@ const SidebarNavigation = ({
         )}
       </div>
 
-      {isMobile && rangeOpening?.data && (
+      {isMobile && isBeforeDeadline && (
         <div className="p-4 border-t border-white/30">
           <Coutndown />
         </div>

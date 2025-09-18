@@ -2,10 +2,34 @@ import { BorderBeam } from "@/components/magicui/border-beam";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useModalStore } from "@/stores/allModal";
+import { useRangeOpening } from "@/stores/rangeOpening.store";
 import { Plus } from "lucide-react";
+import moment from "moment";
+import { useState } from "react";
+import { toast } from "react-toastify";
 
 function CreateSubmissionSection() {
   const { openModal } = useModalStore();
+  const rangeOpening = useRangeOpening().useGlobalStore(
+    (s) => s["getRangeOpeningData"]
+  );
+
+  const [isBeforeDeadline] = useState(
+    moment().isBefore(
+      moment(
+        `${rangeOpening?.data?.tanggal_akhir} ${rangeOpening?.data?.jam_akhir}`,
+        "YYYY-MM-DD HH:mm:ss"
+      )
+    )
+  );
+
+  const handleCreateSubmission = () => {
+    if (!isBeforeDeadline) {
+      openModal("CreateSubmission");
+    } else {
+      toast.error("Deadline pengajuan sudah berakhir");
+    }
+  };
 
   return (
     <div className="h-full relative rounded-xl overflow-hidden shadow-lg">
@@ -21,7 +45,7 @@ function CreateSubmissionSection() {
               variant="ghost"
               size="icon"
               className="w-12 h-12 rounded-full border-2 border-green-500 text-green-500 hover:bg-green-50 cursor-pointer"
-              onClick={() => openModal("CreateSubmission")}
+              onClick={handleCreateSubmission}
             >
               <Plus className="w-6 h-6" />
             </Button>

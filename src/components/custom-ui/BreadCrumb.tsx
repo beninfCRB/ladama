@@ -12,6 +12,15 @@ function BreadCrumb() {
     (s) => s["getRangeOpeningData"]
   );
 
+  const [isBeforeDeadline] = useState(
+    moment().isBefore(
+      moment(
+        `${rangeOpening?.data?.tanggal_akhir} ${rangeOpening?.data?.jam_akhir}`,
+        "YYYY-MM-DD HH:mm:ss"
+      )
+    )
+  );
+
   return (
     <div className="hidden lg:flex lg:flex-between">
       <div className="flex-3 space-y-4">
@@ -26,7 +35,7 @@ function BreadCrumb() {
           {date.format("DD MMMM YYYY, HH:mm:ss")}
         </p>
       </div>
-      {rangeOpening?.data && <Coutndown />}
+      {isBeforeDeadline && <Coutndown />}
     </div>
   );
 }
