@@ -51,7 +51,10 @@ import {
   SubmissionSchema,
   type submissionFormType,
 } from "@/schemas/submission.schema";
-import { usePengajuanKegiatan } from "@/stores/pengajuanKegiatan.store";
+import {
+  usePengajuanKegiatan,
+  useRabPengajuanKegiatan,
+} from "@/stores/pengajuanKegiatan.store";
 import type { FileType } from "@/types/upload";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Check, CheckCheck, Megaphone } from "lucide-react";
@@ -96,6 +99,7 @@ export function CreateSubmissionModal() {
   const pengajuanKegiatan = pengajuanKegiatanStore(
     (s) => s["pengajuanKegiatanData"]
   );
+  const rabPengajuanKegiatan = useRabPengajuanKegiatan();
 
   const fetchSubtematik = async (id: string) => {
     await createSubTematik?.mutate({ tematik_kegiatan_id: id });

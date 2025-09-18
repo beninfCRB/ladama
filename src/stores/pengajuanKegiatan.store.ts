@@ -47,3 +47,11 @@ export const usePengajuanKegiatan = createGlobalStore<
   "pengajuanKegiatan",
   FormData
 >("pengajuanKegiatan", ["create"]);
+
+export function useRabPengajuanKegiatan(id: string) {
+  return createGlobalStore<
+    PengajuanKegiatanTypes,
+    "pengajuanKegiatan",
+    FormData
+  >("pengajuanKegiatan", ["update"])({ id });
+}

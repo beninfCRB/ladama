@@ -59,24 +59,30 @@ function Coutndown() {
         <div className="grid grid-cols-3 text-center gap-4">
           <div className="flex flex-col">
             <span className="font-bold text-2xl">
-              {Number(countdown.hours) < 10
+              {countdown.hours < 10 && countdown.hours > 0
                 ? `0${countdown.hours}`
+                : countdown.hours < 0
+                ? 0
                 : countdown.hours}
             </span>
             <span className="text-sm">Jam</span>
           </div>
           <div className="flex flex-col">
             <span className="font-bold text-2xl">
-              {Number(countdown.minutes) < 10
+              {countdown.minutes < 10 && countdown.minutes > 0
                 ? `0${countdown.minutes}`
+                : countdown.minutes < 0
+                ? 0
                 : countdown.minutes}
             </span>
             <span className="text-sm">Menit</span>
           </div>
           <div className="flex flex-col">
             <span className="font-bold text-2xl">
-              {Number(countdown.seconds) < 10
+              {countdown.seconds < 10 && countdown.seconds > 0
                 ? `0${countdown.seconds}`
+                : countdown.seconds < 0
+                ? 0
                 : countdown.seconds}
             </span>
             <span className="text-sm">Detik</span>
