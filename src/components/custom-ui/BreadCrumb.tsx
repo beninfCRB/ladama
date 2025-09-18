@@ -3,10 +3,14 @@ import moment from "moment";
 import { useState } from "react";
 import { TypingAnimation } from "../magicui/typing-animation";
 import Coutndown from "./Coutndown";
+import { useRangeOpening } from "@/stores/rangeOpening.store";
 
 function BreadCrumb() {
   const [date] = useState(moment());
   const user = useUserStore.getState().user;
+  const rangeOpening = useRangeOpening().useGlobalStore(
+    (s) => s["getRangeOpeningData"]
+  );
 
   return (
     <div className="hidden lg:flex lg:flex-between">
@@ -22,7 +26,7 @@ function BreadCrumb() {
           {date.format("DD MMMM YYYY, HH:mm:ss")}
         </p>
       </div>
-      <Coutndown />
+      {rangeOpening?.data && <Coutndown />}
     </div>
   );
 }

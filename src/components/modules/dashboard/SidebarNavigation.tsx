@@ -12,6 +12,7 @@ import {
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import MenuButton from "./MenuButton";
+import { useRangeOpening } from "@/stores/rangeOpening.store";
 
 interface SidebarNavigationProps {
   isMobile?: boolean;
@@ -28,6 +29,9 @@ const SidebarNavigation = ({
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useUserStore();
+  const rangeOpening = useRangeOpening().useGlobalStore(
+    (s) => s["getRangeOpeningData"]
+  );
 
   const toggleSidebar = () => setIsExpanded((prev) => !prev);
 
@@ -95,7 +99,7 @@ const SidebarNavigation = ({
         )}
       </div>
 
-      {isMobile && (
+      {isMobile && rangeOpening?.data && (
         <div className="p-4 border-t border-white/30">
           <Coutndown />
         </div>
