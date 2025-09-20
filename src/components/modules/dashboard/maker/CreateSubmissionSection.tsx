@@ -35,7 +35,7 @@ function CreateSubmissionSection() {
   }, [deadline]);
 
   const handleCreateSubmission = () => {
-    if (!isBeforeDeadline) {
+    if (isBeforeDeadline) {
       openModal("CreateSubmission");
     } else {
       toast.error("Deadline pengajuan sudah berakhir");
