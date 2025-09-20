@@ -8,12 +8,14 @@ import { useEffect } from "react";
 const queryClient = new QueryClient();
 function App() {
   useEffect(() => {
-    const handler = (e: any) => {
-      e.preventDefault();
+    const handler = (e: Event) => {
+      const promptEvent = e as BeforeInstallPromptEvent;
+      promptEvent.preventDefault();
       console.log("beforeinstallprompt fired");
-      e.prompt(); // munculkan popup install
 
-      e.userChoice.then((choiceResult: any) => {
+      promptEvent.prompt(); // munculkan popup install
+
+      promptEvent.userChoice.then((choiceResult) => {
         if (choiceResult.outcome === "accepted") {
           console.log("User accepted the install prompt");
         } else {
