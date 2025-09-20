@@ -7,9 +7,10 @@ const SubmissionSchema = z.object({
   subtematik_kegiatan_id: z
     .string()
     .min(1, "Subtematik kegiatan tidak boleh kosong."),
+  paket_kegiatan: z.string().optional(),
   paket_kegiatan_id: z.string().min(1, "Paket kegiatan tidak boleh kosong."),
-  nomor_pengajuan: z.string(),
-  jumlah_peserta: z.string(),
+  jumlah_peserta: z.string().optional(),
+  nomor_pengajuan: z.string().optional().nullable(),
   judul_pengajuan_kegiatan: z
     .string()
     .min(1, "Judul pengajuan kegiatan tidak boleh kosong."),
@@ -18,8 +19,8 @@ const SubmissionSchema = z.object({
     .min(1, "Ruang lingkup kegiatan tidak boleh kosong."),
   tujuan_kegiatan: z.string().min(1, "Tujuan kegiatan tidak boleh kosong."),
   proposal_kegiatan: z.string().min(1, "Proposal kegiatan tidak boleh kosong."),
-  waktu_kegiatan: z.string().min(1, "Waktu kegiatan tidak boleh kosong."),
-  tanggal_kegiatan: z.string().min(1, "Tanggal kegiatan tidak boleh kosong."),
+  waktu_kegiatan: z.string().optional().nullable(),
+  tanggal_kegiatan: z.string().optional().nullable(),
   tanggal_kegiatan_awal: z
     .string()
     .min(1, "Tanggal kegiatan tidak boleh kosong."),

@@ -60,7 +60,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Check, CheckCheck, Megaphone } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { set } from "zod";
 
 const tabsvalue = ["tematik", "subtematik", "kegiatan", "paket", "rab"];
 
@@ -121,9 +120,12 @@ export function CreateSubmissionModal() {
 
   const onSubmit = async (values: submissionFormType) => {
     const formData = convertToFormData(values);
-    console.log("🚀 ~ onSubmit ~ formData:", formData);
+    formData.append(
+      "tanggal_kegiatan",
+      `${values.tanggal_kegiatan_awal} - ${values.tanggal_kegiatan_akhir}`
+    );
+    formData.append("waktu_kegiatan", "00:00 - 23:59");
     await createPengajuan?.mutate(formData);
-    setActiveTab("rab");
   };
 
   const handleSelect = (
@@ -146,7 +148,10 @@ export function CreateSubmissionModal() {
       setActiveTab("rab");
       fetchRabPengajuanKegiatan();
     }
-  }, [createPengajuan?.isSuccess]);
+    if (createPengajuan?.isError && rab?.komponen_rab) {
+      setActiveTab("paket");
+    }
+  }, [createPengajuan?.isSuccess, createPengajuan?.isError, rab?.komponen_rab]);
 
   const Tablist = () => (
     <div className="flex flex-col items-center gap-2 mb-4">
@@ -177,7 +182,12 @@ export function CreateSubmissionModal() {
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form
+            onSubmit={form.handleSubmit(onSubmit, (errors) => {
+              console.log("❌ Semua error:", errors);
+            })}
+            className="space-y-6"
+          >
             <Tabs value={activeTab}>
               {/* Tab Tematik */}
               <TabsContent value="tematik">
@@ -319,7 +329,7 @@ export function CreateSubmissionModal() {
 
                 <FormField
                   control={form.control}
-                  name="paket_kegiatan_id"
+                  name="paket_kegiatan"
                   render={({ field }) => (
                     <div className="space-y-4 md:p-0 lg:p-8">
                       {paketKegiatan?.data?.data &&
@@ -381,8 +391,8 @@ export function CreateSubmissionModal() {
                               <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
                                 <FormField
                                   control={form.control}
-                                  name="jumlah_peserta"
-                                  render={({ field: fieldJumlah }) => (
+                                  name="paket_kegiatan_id"
+                                  render={({ field }) => (
                                     <FormItem>
                                       <RequiredLabel required>
                                         Jumlah{" "}
@@ -393,8 +403,18 @@ export function CreateSubmissionModal() {
                                       </RequiredLabel>
                                       <FormControl>
                                         <Select
-                                          value={fieldJumlah.value}
-                                          onValueChange={fieldJumlah.onChange}
+                                          value={field.value}
+                                          onValueChange={(value) => {
+                                            field.onChange(value);
+                                            form.setValue(
+                                              "jumlah_peserta",
+                                              String(
+                                                activity?.paket_kegiatan?.find(
+                                                  (item) => item.id === value
+                                                )?.jumlah_peserta
+                                              )
+                                            );
+                                          }}
                                         >
                                           <SelectTrigger
                                             className="w-full"
@@ -407,7 +427,7 @@ export function CreateSubmissionModal() {
                                               (option) => (
                                                 <SelectItem
                                                   key={option.id}
-                                                  value={option.jumlah_peserta.toString()}
+                                                  value={option.id}
                                                 >
                                                   {option.jumlah_peserta}
                                                 </SelectItem>
@@ -421,6 +441,7 @@ export function CreateSubmissionModal() {
                                   )}
                                 />
                                 <Button
+                                  type="button"
                                   disabled={!form.watch().jumlah_peserta}
                                   className="bg-green-600 hover:bg-green-700 hover:scale-95 text-white rounded-md flex items-center justify-center text-sm w-full lg:w-1/4"
                                   onChange={() => {}}
@@ -636,7 +657,82 @@ export function CreateSubmissionModal() {
                 </div>
                 <Tablist />
 
-                <div className="bg-card p-6 rounded-lg space-y-4"></div>
+                <div className="bg-card p-6 rounded-lg space-y-4">
+                  <div className="overflow-x-auto border border-border rounded-lg">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-border bg-muted">
+                          <th className="text-left p-3 font-semibold text-foreground min-w-[40px]">
+                            No
+                          </th>
+                          <th className="text-left p-3 font-semibold text-foreground min-w-[120px]">
+                            Deskripsi
+                          </th>
+                          <th className="text-left p-3 font-semibold text-foreground min-w-[80px]">
+                            Satuan
+                          </th>
+                          <th className="text-right p-3 font-semibold text-foreground min-w-[100px]">
+                            Harga Unit
+                          </th>
+                          <th className="text-right p-3 font-semibold text-foreground min-w-[60px]">
+                            Jumlah
+                          </th>
+                          <th className="text-right p-3 font-semibold text-foreground min-w-[100px]">
+                            Harga Total
+                          </th>
+                        </tr>
+                      </thead>
+                      {/* <tbody>
+                        {budgetData.map((category) => (
+                          <>
+                            <tr key={category.category} className="bg-muted">
+                              <td className="p-3 font-semibold text-foreground">
+                                {category.category}
+                              </td>
+                              <td
+                                className="p-3 font-semibold text-foreground"
+                                colSpan={5}
+                              >
+                                {category.categoryName}
+                              </td>
+                            </tr>
+                            {category.items.map((item) => (
+                              <tr
+                                key={`${category.category}-${item.no}`}
+                                className="border-b border-border hover:bg-muted/20 transition-colors"
+                              >
+                                <td className="p-3 text-muted-foreground">
+                                  {item.no}
+                                </td>
+                                <td className="p-3 text-foreground">
+                                  {item.description}
+                                </td>
+                                <td className="p-3 text-foreground">
+                                  {item.unit}
+                                </td>
+                                <td className="p-3 text-right text-foreground">
+                                  {formatCurrency(item.unitPrice)}
+                                </td>
+                                <td className="p-3 text-right text-foreground">
+                                  {item.quantity}
+                                </td>
+                                <td className="p-3 text-right font-semibold text-foreground">
+                                  {formatCurrency(item.total)}
+                                </td>
+                              </tr>
+                            ))}
+                          </>
+                        ))}
+                        <tr className="border-t-2 border-border bg-muted">
+                          <td className="p-3" colSpan={5}></td>
+                          <td className="p-3 text-right font-bold text-lg text-foreground">
+                            TOTAL: {formatCurrency(totalBudget)}
+                          </td>
+                        </tr>
+                      </tbody> */}
+                    </table>
+                  </div>
+                </div>
               </TabsContent>
             </Tabs>
 
@@ -663,18 +759,16 @@ export function CreateSubmissionModal() {
                   <span className="text-muted-foreground">Kegiatan :</span>
                   <span className="text-[#17a449] text-sm">
                     {paketKegiatan?.data?.data?.find(
-                      (item) => item.id === form.watch().paket_kegiatan_id
+                      (item) => item.id === form.watch().paket_kegiatan
                     )?.jenis_kegiatan ?? "-"}{" "}
                     {form.watch().jumlah_peserta ?? "-"}
                     {paketKegiatan?.data?.data
-                      ?.find(
-                        (item) => item.id === form.watch().paket_kegiatan_id
-                      )
+                      ?.find((item) => item.id === form.watch().paket_kegiatan)
                       ?.jenis_kegiatan.toLowerCase() === "penanaman pohon"
                       ? " Hektar"
                       : paketKegiatan?.data?.data
                           ?.find(
-                            (item) => item.id === form.watch().paket_kegiatan_id
+                            (item) => item.id === form.watch().paket_kegiatan
                           )
                           ?.jenis_kegiatan.toLowerCase() === undefined
                       ? ""
@@ -685,6 +779,7 @@ export function CreateSubmissionModal() {
               <div className="flex lg:justify-end gap-4 w-full">
                 {tabsvalue.indexOf(activeTab) > 0 && (
                   <Button
+                    type="button"
                     className="bg-amber-400 hover:bg-amber-500 hover:scale-90 rounded-xl h-10"
                     onClick={() => handlePrevius()}
                   >
