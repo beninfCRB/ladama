@@ -1,6 +1,5 @@
 "use client";
 
-import Coutndown from "@/components/custom-ui/Coutndown";
 import { useUserStore } from "@/stores/user.store";
 import {
   ChevronLeft,
@@ -12,8 +11,6 @@ import {
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import MenuButton from "./MenuButton";
-import { useRangeOpening } from "@/stores/rangeOpening.store";
-import moment from "moment";
 
 interface SidebarNavigationProps {
   isMobile?: boolean;
@@ -30,18 +27,6 @@ const SidebarNavigation = ({
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useUserStore();
-  const rangeOpening = useRangeOpening().useGlobalStore(
-    (s) => s["getRangeOpeningData"]
-  );
-
-  const [isBeforeDeadline] = useState(
-    moment().isBefore(
-      moment(
-        `${rangeOpening?.data?.tanggal_akhir} ${rangeOpening?.data?.jam_akhir}`,
-        "YYYY-MM-DD HH:mm:ss"
-      )
-    )
-  );
 
   const toggleSidebar = () => setIsExpanded((prev) => !prev);
 
@@ -108,12 +93,6 @@ const SidebarNavigation = ({
           />
         )}
       </div>
-
-      {isMobile && isBeforeDeadline ? (
-        <div className="p-4 border-t border-white/30">
-          <Coutndown />
-        </div>
-      ) : null}
     </div>
   );
 

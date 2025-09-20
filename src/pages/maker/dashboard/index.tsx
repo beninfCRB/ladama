@@ -1,11 +1,15 @@
 import BreadCrumb from "@/components/custom-ui/BreadCrumb";
+import Coutndown from "@/components/custom-ui/Coutndown";
 import ActivityHistory from "@/components/modules/dashboard/maker/ActivityHistory";
 import CreateSubmissionSection from "@/components/modules/dashboard/maker/CreateSubmissionSection";
 import DraftSubmissionSection from "@/components/modules/dashboard/maker/DraftSubmissionSection";
 import ProgressSubmissionSection from "@/components/modules/dashboard/maker/ProgressSubmissionSection";
 import { CreateSubmissionModal } from "@/components/modules/dashboard/maker/submission/CreateSubmission";
+import { useDeadlineStore } from "@/stores/countDown.store";
 
 function DashboardMakerPage() {
+  const { isBeforeDeadline } = useDeadlineStore();
+
   return (
     <main className="flex-1 px-3 sm:px-4 lg:px-6 py-3 sm:py-4 lg:py-6 space-y-3 sm:space-y-4 lg:space-y-6">
       <BreadCrumb />
@@ -13,7 +17,8 @@ function DashboardMakerPage() {
       <CreateSubmissionModal />
 
       <div className="space-y-3 sm:space-y-4 lg:space-y-0">
-        <div className="lg:hidden">
+        <div className="lg:hidden space-y-4">
+          {isBeforeDeadline && <Coutndown />}
           <ProgressSubmissionSection />
         </div>
 

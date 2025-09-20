@@ -5,7 +5,7 @@ import { useModalStore } from "@/stores/allModal";
 import { useRangeOpening } from "@/stores/rangeOpening.store";
 import { Plus } from "lucide-react";
 import moment from "moment";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 function CreateSubmissionSection() {
@@ -14,14 +14,25 @@ function CreateSubmissionSection() {
     (s) => s["getRangeOpeningData"]
   );
 
-  const [isBeforeDeadline] = useState(
-    moment().isBefore(
-      moment(
-        `${rangeOpening?.data?.tanggal_akhir} ${rangeOpening?.data?.jam_akhir}`,
-        "YYYY-MM-DD HH:mm:ss"
-      )
-    )
-  );
+  const [isBeforeDeadline, setIsBeforeDeadline] = useState<boolean>(false);
+
+  const deadline = `${rangeOpening?.data?.tanggal_akhir} ${rangeOpening?.data?.jam_akhir}`;
+
+  useEffect(() => {
+    const checkDeadline = () => {
+      if (moment().isBefore(moment(deadline, "YYYY-MM-DD HH:mm:ss"))) {
+        setIsBeforeDeadline(true);
+      } else {
+        setIsBeforeDeadline(false);
+      }
+    };
+
+    checkDeadline();
+
+    const interval = setInterval(checkDeadline, 1000);
+
+    return () => clearInterval(interval);
+  }, [deadline]);
 
   const handleCreateSubmission = () => {
     if (!isBeforeDeadline) {

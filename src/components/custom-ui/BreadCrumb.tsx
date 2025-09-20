@@ -1,25 +1,14 @@
+import { useDeadlineStore } from "@/stores/countDown.store";
 import { useUserStore } from "@/stores/user.store";
 import moment from "moment";
 import { useState } from "react";
 import { TypingAnimation } from "../magicui/typing-animation";
 import Coutndown from "./Coutndown";
-import { useRangeOpening } from "@/stores/rangeOpening.store";
 
 function BreadCrumb() {
   const [date] = useState(moment());
   const user = useUserStore.getState().user;
-  const rangeOpening = useRangeOpening().useGlobalStore(
-    (s) => s["getRangeOpeningData"]
-  );
-
-  const [isBeforeDeadline] = useState(
-    moment().isBefore(
-      moment(
-        `${rangeOpening?.data?.tanggal_akhir} ${rangeOpening?.data?.jam_akhir}`,
-        "YYYY-MM-DD HH:mm:ss"
-      )
-    )
-  );
+  const { isBeforeDeadline } = useDeadlineStore();
 
   return (
     <div className="hidden lg:flex lg:flex-between">

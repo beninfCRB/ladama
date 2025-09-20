@@ -30,7 +30,7 @@ function App() {
             const choice = await promptEvent.userChoice;
             if (choice.outcome === "accepted") {
               console.log("✅ User accepted install");
-              toast.success("App berhasil diinstall 🚀");
+              toast.success("App berhasil diinstall");
             } else {
               console.log("❌ User dismissed install");
               toast.warn("Install dibatalkan");
