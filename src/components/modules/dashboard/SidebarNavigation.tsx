@@ -109,11 +109,11 @@ const SidebarNavigation = ({
         )}
       </div>
 
-      {isMobile && isBeforeDeadline && (
+      {isMobile && isBeforeDeadline ? (
         <div className="p-4 border-t border-white/30">
           <Coutndown />
         </div>
-      )}
+      ) : null}
     </div>
   );
 
