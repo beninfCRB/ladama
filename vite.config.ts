@@ -24,6 +24,13 @@ export default defineConfig({
         display: "standalone",
         background_color: "#ffffff",
         theme_color: "#17a449",
+        screenshots: [
+          {
+            src: "screenshot/login.png",
+            sizes: "390x844",
+            type: "image/png",
+          },
+        ],
         icons: [
           {
             src: "icons/icon-192.png",
