@@ -29,8 +29,9 @@ import {
   Mail,
   MessageCircle,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
 
 function AuthLogin() {
   const [showPassword, setShowPassword] = useState(false);
@@ -38,6 +39,8 @@ function AuthLogin() {
     (s) => s["banner-informasiData"]
   );
   const { createMutation } = useLogin();
+  const [deferredPrompt, setDeferredPrompt] =
+    useState<BeforeInstallPromptEvent | null>(null);
 
   const form = useForm<loginFormType>({
     resolver: zodResolver(LoginSchema),
@@ -50,6 +53,35 @@ function AuthLogin() {
   function onSubmit(values: loginFormType) {
     createMutation?.mutate(values);
   }
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      e.preventDefault();
+      const promptEvent = e as BeforeInstallPromptEvent;
+      setDeferredPrompt(promptEvent);
+
+      toast.info(
+        <button
+          onClick={async () => {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const choiceResult = await deferredPrompt.userChoice;
+            if (choiceResult.outcome === "accepted") {
+              console.log("User accepted the install prompt");
+            } else {
+              console.log("User dismissed the install prompt");
+            }
+            setDeferredPrompt(null);
+          }}
+        >
+          📲 Install App
+        </button>
+      );
+    };
+
+    window.addEventListener("beforeinstallprompt", handler);
+    return () => window.removeEventListener("beforeinstallprompt", handler);
+  }, [deferredPrompt]);
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row relative">
