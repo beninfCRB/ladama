@@ -9,7 +9,7 @@ declare module "virtual:pwa-register" {
     onRegistered?: (
       registration: ServiceWorkerRegistration | undefined
     ) => void;
-    onRegisterError?: (error: any) => void;
+    onRegisterError?: (error: unknown) => void; // gunakan unknown dulu
   };
 
   export function registerSW(

@@ -1,5 +1,5 @@
 import { createGlobalStore } from "@/lib/globalStore";
-import type { PaketKegaiatanTypes } from "./paketKegiatan.store";
+import type { SubPaketKegiatanTypes } from "./paketKegiatan.store";
 
 interface SubDraftFileDocumentTypes {
   id: string;
@@ -27,7 +27,11 @@ export interface DraftPengajuanKegiatanType {
   proposal_kegiatan: string;
   tujuan_kegiatan: string;
   ruang_lingkup_kegiatan: string;
-  paket_kegiatan: PaketKegaiatanTypes;
+  paket_kegiatan: {
+    id: string;
+    jenis_kegiatan: string;
+    paket_kegiatan: SubPaketKegiatanTypes;
+  };
   jenis_kegiatan_id: string;
   fileDocument: Array<SubDraftFileDocumentTypes>;
   nomor_pengajuan: string;

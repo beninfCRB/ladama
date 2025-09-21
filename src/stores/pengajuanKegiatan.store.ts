@@ -38,6 +38,8 @@ export interface KomponenRabArrayTypes {
   };
 }
 
+export type KomponenRabKeys = keyof KomponenRabArrayTypes["komponen_rab"];
+
 export interface PengajuanKegiatanTypes extends KomponenRabArrayTypes {
   id_pengajuan: string;
   nomor_pengajuan: string;
@@ -51,10 +53,14 @@ export const usePengajuanKegiatan = createGlobalStore<
   FormData
 >("pengajuanKegiatan", ["create"]);
 
-export function useRabPengajuanKegiatan(id: string) {
-  return createGlobalStore<
-    PengajuanKegiatanTypes,
-    "pengajuanKegiatan",
-    FormData
-  >("pengajuanKegiatan", ["update"])({ id });
-}
+export const useRabPengajuanKegiatan = createGlobalStore<
+  PengajuanKegiatanTypes,
+  "pengajuanKegiatan",
+  {
+    komponen_rab: Array<{
+      id_komponen: string;
+      harga_unit: number;
+      qty: number;
+    }>;
+  }
+>("pengajuanKegiatan", ["update"]);

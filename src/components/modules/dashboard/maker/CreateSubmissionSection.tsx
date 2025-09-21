@@ -2,43 +2,59 @@ import { BorderBeam } from "@/components/magicui/border-beam";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useModalStore } from "@/stores/allModal";
-import { useRangeOpening } from "@/stores/rangeOpening.store";
+import { useDeadlineStore } from "@/stores/countDown.store";
+import { type DraftPengajuanKegiatanType } from "@/stores/draftPengajuanKegiatan.store";
+import { useProgressKegiatan } from "@/stores/progressKegiatan.store";
 import { Plus } from "lucide-react";
-import moment from "moment";
-import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
-function CreateSubmissionSection() {
+interface CreateSubmissionSectionProps {
+  draftPengajuanKegiatan?: DraftPengajuanKegiatanType;
+}
+
+function CreateSubmissionSection({
+  draftPengajuanKegiatan,
+}: CreateSubmissionSectionProps) {
   const { openModal } = useModalStore();
-  const rangeOpening = useRangeOpening().useGlobalStore(
-    (s) => s["getRangeOpeningData"]
+  const { isBeforeDeadline } = useDeadlineStore();
+  const progress = useProgressKegiatan().useGlobalStore(
+    (s) => s["getDataProsesKegiatanData"]
   );
 
-  const [isBeforeDeadline, setIsBeforeDeadline] = useState<boolean>(false);
-
-  const deadline = `${rangeOpening?.data?.tanggal_akhir} ${rangeOpening?.data?.jam_akhir}`;
-
-  useEffect(() => {
-    const checkDeadline = () => {
-      if (moment().isBefore(moment(deadline, "YYYY-MM-DD HH:mm:ss"))) {
-        setIsBeforeDeadline(true);
-      } else {
-        setIsBeforeDeadline(false);
-      }
-    };
-
-    checkDeadline();
-
-    const interval = setInterval(checkDeadline, 1000);
-
-    return () => clearInterval(interval);
-  }, [deadline]);
-
   const handleCreateSubmission = () => {
-    if (isBeforeDeadline) {
+    if (
+      isBeforeDeadline &&
+      draftPengajuanKegiatan?.status !== "draft" &&
+      progress?.data?.length === 0
+    ) {
       openModal("CreateSubmission");
+    } else if (
+      isBeforeDeadline &&
+      draftPengajuanKegiatan?.status === "draft" &&
+      progress?.data?.length === 0
+    ) {
+      toast.error(
+        "Pengajuan kegiatan anda belum lengkap, klik draft untuk melengkapi",
+        {
+          position: "top-center",
+        }
+      );
+    } else if (
+      isBeforeDeadline &&
+      draftPengajuanKegiatan?.status !== "draft" &&
+      progress?.data &&
+      progress?.data?.length > 0
+    ) {
+      toast.error(
+        "Pengajuan kegiatan anda belum selesai, klik lihat detail untuk melengkapi",
+        {
+          position: "top-center",
+        }
+      );
     } else {
-      toast.error("Deadline pengajuan sudah berakhir");
+      toast.error("Deadline pengajuan sudah berakhir", {
+        position: "top-center",
+      });
     }
   };
 

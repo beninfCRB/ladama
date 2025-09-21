@@ -1,3 +1,4 @@
+import type { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 
 const SubmissionSchema = z.object({
@@ -70,5 +71,10 @@ const SubmissionSchema = z.object({
 });
 
 type submissionFormType = z.infer<typeof SubmissionSchema>;
+type submissionFormReturnType = UseFormReturn<z.infer<typeof SubmissionSchema>>;
 
-export { SubmissionSchema, type submissionFormType };
+export {
+  SubmissionSchema,
+  type submissionFormType,
+  type submissionFormReturnType,
+};
