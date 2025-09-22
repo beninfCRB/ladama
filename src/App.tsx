@@ -24,6 +24,7 @@ function App() {
 
       toast.info(
         <button
+          className="bg-[#16a34a] text-white py-[8px] px-[16px] rounded-lg border-0 cursor-pointer"
           onClick={async () => {
             if (!promptEvent) return;
             await promptEvent.prompt();
@@ -36,14 +37,6 @@ function App() {
               toast.warn("Install dibatalkan");
             }
             setDeferredPrompt(null);
-          }}
-          style={{
-            background: "#16a34a",
-            color: "white",
-            padding: "8px 16px",
-            borderRadius: "6px",
-            border: "none",
-            cursor: "pointer",
           }}
         >
           📲 Install App

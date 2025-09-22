@@ -11,6 +11,7 @@ import {
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import MenuButton from "./MenuButton";
+import PwaDownloadButton from "@/components/custom-ui/PwaDownloadButton";
 
 interface SidebarNavigationProps {
   isMobile?: boolean;
@@ -80,17 +81,20 @@ const SidebarNavigation = ({
         />
 
         {isMobile && (
-          <MenuButton
-            isActive={false}
-            label="Logout"
-            icon={LogOut}
-            isExpanded={isExpanded}
-            isMobile={isMobile}
-            onClick={() => {
-              if (isMobile && onMobileToggle) onMobileToggle();
-              if (onLogout) onLogout();
-            }}
-          />
+          <>
+            <MenuButton
+              isActive={false}
+              label="Logout"
+              icon={LogOut}
+              isExpanded={isExpanded}
+              isMobile={isMobile}
+              onClick={() => {
+                if (isMobile && onMobileToggle) onMobileToggle();
+                if (onLogout) onLogout();
+              }}
+            />
+            <PwaDownloadButton />
+          </>
         )}
       </div>
     </div>
