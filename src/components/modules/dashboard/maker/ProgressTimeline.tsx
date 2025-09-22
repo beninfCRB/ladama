@@ -91,9 +91,9 @@ function ProgressTimeline({ logKegiatan, rowSelected }: ProgressTimelineProps) {
                       Tahap {index + 1}: {step.tahapan_kegiatan}
                     </h3>
 
-                    {step.tanggal_selesai !== null ? (
+                    {step.tanggal_selesai ? (
                       <>
-                        {rowSelected?.tahapan_pengajuan < 20 && (
+                        {Number(rowSelected?.tahapan_pengajuan) < 20 && (
                           <>
                             {Number(step.code_id) === 4 ? (
                               <Button
