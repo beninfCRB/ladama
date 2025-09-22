@@ -77,121 +77,133 @@ function ProgressTimeline({ logKegiatan, rowSelected }: ProgressTimelineProps) {
             <div>
               {/* Desktop timeline */}
               <ol className="hidden sm:block relative border-s border-gray-200">
-                {logKegiatan?.map((step, index) => (
-                  <li key={step.id} className="mb-10 ms-6">
-                    <span
-                      className={`absolute -start-3 flex h-6 w-6 items-center justify-center rounded-full ${
-                        step.tanggal_selesai === null
-                          ? "bg-gray-400"
-                          : "bg-green-600"
-                      } ring-8 ring-white`}
-                    />
+                {logKegiatan && logKegiatan?.length > 0 ? (
+                  logKegiatan?.map((step, index) => (
+                    <li key={step.id} className="mb-10 ms-6">
+                      <span
+                        className={`absolute -start-3 flex h-6 w-6 items-center justify-center rounded-full ${
+                          step.tanggal_selesai === null
+                            ? "bg-gray-400"
+                            : "bg-green-600"
+                        } ring-8 ring-white`}
+                      />
 
-                    <h3 className="font-semibold text-white">
-                      Tahap {index + 1}: {step.tahapan_kegiatan}
-                    </h3>
+                      <h3 className="font-semibold text-white">
+                        Tahap {index + 1}: {step.tahapan_kegiatan}
+                      </h3>
 
-                    {step.tanggal_selesai ? (
-                      <>
-                        {Number(rowSelected?.tahapan_pengajuan) < 20 && (
-                          <>
-                            {Number(step.code_id) === 4 ? (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className={`mt-2 ${
-                                  step.tanggal_selesai !== null &&
-                                  "bg-green-600 text-white"
-                                }`}
-                                disabled={step.tanggal_selesai === null}
-                              >
-                                Form Perjanjian
-                              </Button>
-                            ) : Number(step.code_id) === 6 ||
-                              Number(step.code_id) === 9 ? (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className={`mt-2 ${
-                                  step.tanggal_selesai !== null &&
-                                  "bg-green-600 text-white"
-                                }`}
-                                disabled={step.tanggal_selesai === null}
-                              >
-                                Form Laporan
-                              </Button>
-                            ) : (
-                              <Button
-                                variant="link"
-                                className="text-white text-sm hover:underline"
-                              >
-                                Lihat Detail
-                              </Button>
-                            )}
-                          </>
-                        )}
+                      {step.tanggal_selesai ? (
+                        <>
+                          {Number(rowSelected?.tahapan_pengajuan) < 20 && (
+                            <>
+                              {Number(step.code_id) === 4 ? (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className={`mt-2 ${
+                                    step.tanggal_selesai !== null &&
+                                    "bg-green-600 text-white"
+                                  }`}
+                                  disabled={step.tanggal_selesai === null}
+                                >
+                                  Form Perjanjian
+                                </Button>
+                              ) : Number(step.code_id) === 6 ||
+                                Number(step.code_id) === 9 ? (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className={`mt-2 ${
+                                    step.tanggal_selesai !== null &&
+                                    "bg-green-600 text-white"
+                                  }`}
+                                  disabled={step.tanggal_selesai === null}
+                                >
+                                  Form Laporan
+                                </Button>
+                              ) : (
+                                <Button
+                                  variant="link"
+                                  className="text-white text-sm hover:underline"
+                                >
+                                  Lihat Detail
+                                </Button>
+                              )}
+                            </>
+                          )}
+                          <time className="block mt-1 text-sm text-white">
+                            {`Selesai ${moment(
+                              step.tanggal_selesai.split(" ")[0]
+                            ).format("DD MMMM YYYY")}`}
+                          </time>
+                        </>
+                      ) : (
                         <time className="block mt-1 text-sm text-white">
-                          {`Selesai ${moment(
-                            step.tanggal_selesai.split(" ")[0]
-                          ).format("DD MMMM YYYY")}`}
+                          Belum Mulai
                         </time>
-                      </>
-                    ) : (
-                      <time className="block mt-1 text-sm text-white">
-                        Belum Mulai
-                      </time>
-                    )}
-                  </li>
-                ))}
+                      )}
+                    </li>
+                  ))
+                ) : (
+                  <div className="w-full flex justify-center items-center">
+                    <Spinner />
+                  </div>
+                )}
               </ol>
 
               {/* Mobile timeline (card style) */}
               <div className="sm:hidden flex flex-col gap-4">
-                {logKegiatan?.map((step, index) => (
-                  <div
-                    key={step.id}
-                    className="rounded-lg bg-white/10 p-4 shadow"
-                  >
-                    <h3 className="font-semibold">
-                      Tahap {index + 1}: {step.tahapan_kegiatan}
-                    </h3>
-                    <p className="text-sm mt-1">
-                      {step.tanggal_selesai
-                        ? `Selesai ${moment(
-                            step.tanggal_selesai.split(" ")[0]
-                          ).format("DD MMMM YYYY")}`
-                        : "Belum Mulai"}
-                    </p>
+                {logKegiatan && logKegiatan?.length > 0 ? (
+                  logKegiatan?.map((step, index) => (
+                    <div
+                      key={step.id}
+                      className="rounded-lg bg-white/10 p-4 shadow"
+                    >
+                      <h3 className="font-semibold">
+                        Tahap {index + 1}: {step.tahapan_kegiatan}
+                      </h3>
+                      <p className="text-sm mt-1">
+                        {step.tanggal_selesai
+                          ? `Selesai ${moment(
+                              step.tanggal_selesai.split(" ")[0]
+                            ).format("DD MMMM YYYY")}`
+                          : "Belum Mulai"}
+                      </p>
 
-                    {Number(step.code_id) === 4 ? (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="mt-2"
-                        disabled={step.tanggal_selesai === null}
-                      >
-                        Form Perjanjian
-                      </Button>
-                    ) : Number(step.code_id) === 6 ||
-                      Number(step.code_id) === 9 ? (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="mt-2"
-                        disabled={step.tanggal_selesai === null}
-                      >
-                        Form Laporan
-                      </Button>
-                    ) : (
-                      <Button
-                        variant="link"
-                        className="text-white text-sm mt-2 hover:underline"
-                      >
-                        Lihat Detail
-                      </Button>
-                    )}
+                      {Number(step.code_id) === 4 ? (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="mt-2"
+                          disabled={step.tanggal_selesai === null}
+                        >
+                          Form Perjanjian
+                        </Button>
+                      ) : Number(step.code_id) === 6 ||
+                        Number(step.code_id) === 9 ? (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="mt-2"
+                          disabled={step.tanggal_selesai === null}
+                        >
+                          Form Laporan
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="link"
+                          className="text-white text-sm mt-2 hover:underline"
+                        >
+                          Lihat Detail
+                        </Button>
+                      )}
+                    </div>
+                  ))
+                ) : (
+                  <div className="w-full flex justify-center items-center">
+                    <Spinner />
                   </div>
-                ))}
+                )}
               </div>
             </div>
           </div>
