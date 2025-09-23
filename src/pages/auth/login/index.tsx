@@ -150,6 +150,7 @@ function AuthLogin() {
                 />
                 <div className="text-right">
                   <Button
+                    type="button"
                     variant="link"
                     className="p-0 h-auto text-green-600 hover:text-green-700 text-sm"
                     onClick={handleForgetPassword}
