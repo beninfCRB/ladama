@@ -44,7 +44,7 @@ function AuthLogin() {
   }, [createMutation?.isSuccess]);
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row relative">
+    <div className="min-h-screen flex h-[100vh]">
       <div className="w-full bg-linear-to-br from-[#17a449] to-[#A3C537] p-6 lg:p-12 flex justify-center flex-col items-center">
         <div className="w-full max-w-md mb-8 lg:mb-12">
           <div className="flex gap-2 text-center items-center justify-center">
