@@ -31,8 +31,10 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router";
 
 function AuthLogin() {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const bannerData = useBanner().useGlobalStore(
     (s) => s["banner-informasiData"]
@@ -49,6 +51,10 @@ function AuthLogin() {
 
   function onSubmit(values: loginFormType) {
     createMutation?.mutate(values);
+  }
+
+  function handleForgetPassword() {
+    navigate("/auth/forget-password");
   }
 
   return (
@@ -146,6 +152,7 @@ function AuthLogin() {
                   <Button
                     variant="link"
                     className="p-0 h-auto text-green-600 hover:text-green-700 text-sm"
+                    onClick={handleForgetPassword}
                   >
                     Lupa Sandi
                   </Button>

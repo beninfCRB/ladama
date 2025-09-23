@@ -146,7 +146,7 @@ function ProgressTimeline({ logKegiatan, rowSelected }: ProgressTimelineProps) {
                   ))
                 ) : (
                   <div className="w-full flex justify-center items-center">
-                    <Spinner />
+                    <Spinner size={50} />
                   </div>
                 )}
               </ol>
@@ -201,7 +201,7 @@ function ProgressTimeline({ logKegiatan, rowSelected }: ProgressTimelineProps) {
                   ))
                 ) : (
                   <div className="w-full flex justify-center items-center">
-                    <Spinner />
+                    <Spinner size={50} />
                   </div>
                 )}
               </div>

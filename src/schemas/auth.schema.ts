@@ -124,10 +124,21 @@ const RegisterSchema = z.object({
 type registerFormType = z.infer<typeof RegisterSchema>;
 type registerFormReturnType = UseFormReturn<z.infer<typeof RegisterSchema>>;
 
+const ForgetPassword = z.object({
+  email: z
+    .string()
+    .email("Email harus berupa alamat email yang valid.")
+    .min(1, "Email tidak boleh kosong."),
+});
+
+type forgetPasswordSFormType = z.infer<typeof ForgetPassword>;
+
 export {
   LoginSchema,
   RegisterSchema,
+  ForgetPassword,
   type registerFormReturnType,
   type registerFormType,
   type loginFormType,
+  type forgetPasswordSFormType,
 };

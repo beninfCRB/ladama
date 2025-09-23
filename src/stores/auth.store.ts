@@ -12,10 +12,15 @@ export const useLogin = createGlobalStore<LoginTypes, "login">(
   handlerLogin
 );
 
-export const useRegister = createGlobalStore<FormData, "registerdua">(
+export const useRegister = createGlobalStore<null, "registerdua", FormData>(
   "registerdua",
   ["create"]
 );
+export const useForgetPassword = createGlobalStore<
+  null,
+  "changePassword",
+  { email: string }
+>("changePassword", ["create"]);
 
 interface KodeVerifikasiType {
   email_pic: string;
