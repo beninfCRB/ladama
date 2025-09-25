@@ -6,12 +6,10 @@ import DraftSubmissionSection from "@/components/modules/dashboard/maker/DraftSu
 import ProgressSubmissionSection from "@/components/modules/dashboard/maker/ProgressSubmissionSection";
 import { CreateSubmissionModal } from "@/components/modules/dashboard/maker/submission/CreateSubmissionModal";
 import { useModalStore } from "@/stores/allModal";
-import { useDeadlineStore } from "@/stores/countDown.store";
 import { useDraftPengajuanKegiatan } from "@/stores/draftPengajuanKegiatan.store";
 import { useState } from "react";
 
 function DashboardMakerPage() {
-  const { isBeforeDeadline } = useDeadlineStore();
   const { openModal } = useModalStore();
   const [isDraft, setDraft] = useState<boolean>(false);
   const draftPengajuanKegiatan = useDraftPengajuanKegiatan().useGlobalStore(
@@ -36,7 +34,7 @@ function DashboardMakerPage() {
 
       <div className="space-y-3 sm:space-y-4 lg:space-y-0">
         <div className="lg:hidden space-y-4">
-          {isBeforeDeadline && <Coutndown />}
+          <Coutndown />
           <ProgressSubmissionSection />
         </div>
 

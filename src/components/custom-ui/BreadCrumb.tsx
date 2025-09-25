@@ -1,4 +1,3 @@
-import { useDeadlineStore } from "@/stores/countDown.store";
 import { useUserStore } from "@/stores/user.store";
 import moment from "moment";
 import { useState } from "react";
@@ -8,7 +7,6 @@ import Coutndown from "./Coutndown";
 function BreadCrumb() {
   const [date] = useState(moment());
   const user = useUserStore.getState().user;
-  const { isBeforeDeadline } = useDeadlineStore();
 
   return (
     <div className="hidden lg:flex lg:flex-between">
@@ -24,7 +22,7 @@ function BreadCrumb() {
           {date.format("DD MMMM YYYY, HH:mm:ss")}
         </p>
       </div>
-      {isBeforeDeadline && <Coutndown />}
+      <Coutndown />
     </div>
   );
 }
