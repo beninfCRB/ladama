@@ -1,12 +1,20 @@
 import { useUserStore } from "@/stores/user.store";
 import moment from "moment";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TypingAnimation } from "../magicui/typing-animation";
 import Coutndown from "./Coutndown";
 
 function BreadCrumb() {
-  const [date] = useState(moment());
+  const [date, setDate] = useState(moment());
   const user = useUserStore.getState().user;
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setDate(moment());
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="hidden lg:flex lg:flex-between">
