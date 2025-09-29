@@ -31,11 +31,11 @@ type AllowedMethods = Array<"read" | "create" | "update" | "delete">;
 //Helper success
 const messageSuccess = (res?: string | object[]) => {
   if (typeof res === "string") {
-    toast.success(res);
+    toast.success(res, { position: "top-center" });
   } else if (Array.isArray(res)) {
     res.forEach((message) => {
       if (typeof message === "string") {
-        toast.success(message);
+        toast.success(message, { position: "top-center" });
       }
     });
   }
@@ -46,15 +46,21 @@ const messageError = (
   res?: string | Array<string | string[]> | Record<string, string[]>
 ) => {
   if (typeof res === "string") {
-    toast.error(res);
+    toast.error(res, { position: "top-center" });
   } else if (Array.isArray(res)) {
     res.forEach((item) => {
-      if (typeof item === "string") toast.error(item);
-      else item.forEach((message) => toast.error(message));
+      if (typeof item === "string")
+        toast.error(item, { position: "top-center" });
+      else
+        item.forEach((message) =>
+          toast.error(message, { position: "top-center" })
+        );
     });
   } else if (res && typeof res === "object") {
     Object.values(res).forEach((messages) => {
-      messages.forEach((message) => toast.error(message));
+      messages.forEach((message) =>
+        toast.error(message, { position: "top-center" })
+      );
     });
   }
 };
